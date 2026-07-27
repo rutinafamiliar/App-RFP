@@ -1,0 +1,1793 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rutina Familiar Positiva - Umbral Mental (CALMA)</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Paleta oficial Umbral Mental — Manual de Marca
+        // Regla de oro: 60% Oscuro · 25% Violeta · 10% Ámbar · 5% Naranja (solo CTAs de compra/acción)
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        // "purple" = escala principal de marca (Crema -> Violeta -> Oscuro)
+                        purple: {
+                            50:  '#F5F2EC', // Crema — blanco cálido de marca
+                            100: '#E1D3E5',
+                            150: '#D8C3E1',
+                            200: '#CCB0DC',
+                            300: '#B890D5',
+                            400: '#A26DCD',
+                            500: '#8F4EC5',
+                            600: '#7B2FBE', // Violeta — color principal de marca
+                            700: '#632BA3',
+                            800: '#4C2788',
+                            900: '#372470',
+                            950: '#26215C', // Oscuro — dominante de marca (60%)
+                        },
+                        // "orange" = acento de marca (Naranja para CTAs, Ámbar como acento profundo)
+                        orange: {
+                            50:  '#FBF3EC',
+                            100: '#F7DCC2',
+                            200: '#F9C697',
+                            300: '#FBA95E',
+                            400: '#FD8F2A',
+                            500: '#FF7900', // Naranja — usar solo en llamados a la acción (5%)
+                            600: '#E27214',
+                            700: '#AD6639', // Ámbar — acento secundario (10%)
+                            800: '#7E4E45',
+                            900: '#5C3D4E',
+                        },
+                        // "indigo" = variante oscura de marca (usada en degradados del logo)
+                        indigo: {
+                            700: '#26215C', // Oscuro
+                            950: '#1B1840',
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Alpine.js for robust standalone state management -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        [x-cloak] { display: none !important; }
+        .breathing-ring {
+            transition: transform 4s ease-in-out;
+        }
+        @media print {
+            header, footer, nav, button, form, .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-purple-50/30 text-purple-950 font-sans min-h-screen flex flex-col justify-between selection:bg-purple-100 selection:text-purple-900"
+      x-data="appState()" x-init="init()">
+
+    <!-- Decorative background blobs -->
+    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-purple-200/20 rounded-full blur-3xl pointer-events-none -z-10 no-print"></div>
+    <div class="fixed bottom-0 right-1/4 w-[400px] h-[400px] bg-orange-100/30 rounded-full blur-3xl pointer-events-none -z-10 no-print"></div>
+
+    <!-- Header navigation -->
+    <header class="bg-white/90 backdrop-blur-md border-b border-purple-100 sticky top-0 z-40 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-br from-purple-600 to-indigo-700 p-2.5 rounded-2xl text-white shadow-md shadow-purple-200">
+                    <span class="font-display font-extrabold text-lg tracking-wider">UM</span>
+                </div>
+                <div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-[10px] uppercase font-black tracking-widest text-purple-600">Umbral Mental</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
+                        <span class="text-[10px] uppercase font-black tracking-widest text-orange-600">CALMA</span>
+                    </div>
+                    <h1 class="font-display font-black text-xl md:text-2xl text-purple-950 tracking-tight">
+                        Rutina Familiar Positiva
+                    </h1>
+                </div>
+            </div>
+
+            <!-- Header Quick Action buttons -->
+            <div class="flex items-center gap-2">
+                <button @click="activeTab = 'sos'" class="bg-red-50 hover:bg-red-100 border border-red-100 text-red-600 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-sm transition-all">
+                    <span>🚨 S.O.S. Rabieta</span>
+                </button>
+                <button @click="activeTab = 'coach'; coachSubTab = 'planner'" class="bg-purple-50 hover:bg-purple-100 border border-purple-100 text-purple-700 px-4 py-2 rounded-xl text-xs font-bold uppercase flex items-center gap-1.5 transition-all">
+                    <span>🧭 Asesor CALMA</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Horizontal Nav Tabs -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-x-auto border-t border-purple-50">
+            <div class="flex py-1 gap-1">
+                <template x-for="tab in tabs" :key="tab.id">
+                    <button @click="activeTab = tab.id"
+                            :class="activeTab === tab.id ? 'border-purple-600 text-purple-800' : 'border-transparent text-purple-400 hover:text-purple-700'"
+                            class="py-3 px-4 text-xs font-bold uppercase border-b-2 whitespace-nowrap transition-all flex items-center gap-2">
+                        <span x-text="tab.icon"></span>
+                        <span x-text="tab.label"></span>
+                    </button>
+                </template>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Chapter 1: Ebook Reader -->
+        <div x-show="activeTab === 'book'" class="space-y-6" x-transition>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Chapters list sidebar -->
+                <div class="lg:col-span-4 space-y-3 no-print">
+                    <span class="text-xs font-black text-purple-950 uppercase tracking-widest pl-1">Capítulos de la Guía</span>
+                    <div class="bg-white/70 backdrop-blur-md p-4 rounded-2xl border border-purple-100 shadow-sm space-y-2">
+                        <template x-for="sec in ebookSections" :key="sec.id">
+                            <button @click="selectedEbookSection = sec.id"
+                                    :class="selectedEbookSection === sec.id ? 'bg-purple-600 text-white border-purple-700 shadow' : 'bg-white hover:bg-purple-50 text-purple-900 border-purple-100'"
+                                    class="w-full p-3 rounded-xl border text-left font-bold text-xs md:text-sm transition-all flex items-center justify-between">
+                                <span class="truncate pr-2" x-text="sec.title"></span>
+                                <span class="flex-shrink-0 text-xs" x-text="sec.moduleNumber ? 'Módulo ' + sec.moduleNumber : '📖'"></span>
+                            </button>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Active chapter content view -->
+                <div class="lg:col-span-8">
+                    <template x-for="sec in ebookSections" :key="sec.id">
+                        <div x-show="selectedEbookSection === sec.id" class="bg-white p-6 md:p-8 rounded-3xl border border-purple-100 shadow-sm space-y-6">
+                            <div>
+                                <span class="text-xs uppercase font-black text-orange-500 tracking-wider">Libro Completo • Umbral Mental</span>
+                                <h3 class="font-display font-black text-2xl md:text-3xl text-purple-950 mt-1" x-text="sec.title"></h3>
+                                <p class="text-purple-500 text-xs md:text-sm italic mt-1" x-text="sec.subtitle"></p>
+                            </div>
+
+                            <div class="prose prose-purple max-w-none text-purple-900 text-sm md:text-base space-y-4 leading-relaxed">
+                                <template x-for="p in sec.content" :key="p">
+                                    <p x-text="p"></p>
+                                </template>
+                            </div>
+
+                            <!-- Highlights block -->
+                            <template x-if="sec.highlightedQuotes && sec.highlightedQuotes.length">
+                                <div class="bg-purple-50 p-5 rounded-2xl border border-purple-100/50 space-y-3">
+                                    <template x-for="q in sec.highlightedQuotes" :key="q">
+                                        <p class="font-display font-bold text-purple-900 text-sm italic border-l-4 border-purple-400 pl-3">
+                                            " <span x-text="q"></span> "
+                                        </p>
+                                    </template>
+                                </div>
+                            </template>
+
+                            <!-- Takeaways block -->
+                            <template x-if="sec.keyTakeaways && sec.keyTakeaways.length">
+                                <div class="space-y-3">
+                                    <h4 class="font-sans font-bold text-purple-950 text-sm uppercase tracking-wider">Puntos clave de este capítulo:</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <template x-for="tk in sec.keyTakeaways" :key="tk">
+                                            <div class="bg-orange-50/40 p-3.5 rounded-xl border border-orange-100/50 flex gap-2.5 items-start">
+                                                <span class="text-orange-500">✔️</span>
+                                                <span class="text-purple-950 text-xs font-semibold" x-text="tk"></span>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- Deep link button to advisor -->
+                            <div class="pt-4 border-t border-purple-50 flex justify-end no-print">
+                                <button @click="deepLinkToCoach(sec.id)" class="bg-purple-50 hover:bg-purple-100 border border-purple-100 text-purple-700 font-bold text-xs py-2 px-4 rounded-xl flex items-center gap-1.5 transition-colors">
+                                    <span>🧭 Consultar al Asesor de Calma sobre esto</span>
+                                    <span>➔</span>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chapter 2: 21-Day Challenge -->
+        <div x-show="activeTab === 'challenge'" class="space-y-6" x-transition>
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                <!-- Left panel: Grid of 21 days -->
+                <div class="xl:col-span-2 bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-purple-100 shadow-sm flex flex-col gap-6">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-purple-50 pb-4">
+                        <div>
+                            <h3 class="font-sans font-black text-xl text-purple-950 flex items-center gap-2">
+                                <span>📅</span> Reto de 21 Días de Crianza Respetuosa
+                            </h3>
+                            <p class="text-purple-500 text-xs mt-1">
+                                Sigue los hábitos diarios del Método CALMA para transformar la armonía de tu hogar.
+                            </p>
+                        </div>
+                        <div class="bg-purple-50 border border-purple-200 rounded-2xl px-4 py-2 text-center flex-shrink-0">
+                            <span class="text-[10px] font-bold text-purple-500 uppercase block">Progreso del Reto</span>
+                            <span class="text-lg font-black text-purple-950" x-text="getChallengeProgressText()"></span>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="relative pt-1">
+                        <div class="flex mb-2 items-center justify-between text-xs font-bold text-purple-600">
+                            <span>Completado</span>
+                            <span x-text="getChallengeProgressPercent() + '%'"></span>
+                        </div>
+                        <div class="overflow-hidden h-2.5 rounded-full bg-purple-100">
+                            <div :style="'width: ' + getChallengeProgressPercent() + '%'" class="h-full bg-gradient-to-r from-purple-500 to-orange-400 transition-all duration-500"></div>
+                        </div>
+                    </div>
+
+                    <!-- Daily checklist grid -->
+                    <div class="grid grid-cols-3 sm:grid-cols-7 gap-3 py-2">
+                        <template x-for="day in challengeDays" :key="day.day">
+                            <button @click="selectedChallengeDayNum = day.day"
+                                    :class="selectedChallengeDayNum === day.day ? 'bg-purple-600 text-white border-purple-700 shadow-md scale-102 font-medium' : day.completed ? 'bg-purple-50 text-purple-800 border-purple-300' : 'bg-white hover:bg-purple-50 text-purple-900 border-purple-100'"
+                                    class="relative h-20 rounded-2xl flex flex-col justify-between p-3 border-2 transition-all">
+                                <div class="flex justify-between items-start w-full text-[10px]">
+                                    <span :class="selectedChallengeDayNum === day.day ? 'text-purple-200' : 'text-purple-400'" x-text="'W' + Math.ceil(day.day / 7)"></span>
+                                    <span x-show="day.completed" x-text="selectedChallengeDayNum === day.day ? '🤍' : '✅'"></span>
+                                </div>
+                                <div class="text-left">
+                                    <span class="block text-xl font-black leading-none" x-text="day.day"></span>
+                                    <span class="text-[9px] font-bold" :class="selectedChallengeDayNum === day.day ? 'text-purple-200' : 'text-purple-500'">DÍA</span>
+                                </div>
+                            </button>
+                        </template>
+                    </div>
+
+                    <!-- Week Legend -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-4 border-t border-purple-50 text-xs">
+                        <div class="flex items-center gap-2 bg-purple-50/50 p-2.5 rounded-xl border border-purple-100">
+                            <span class="w-2.5 h-2.5 rounded-full bg-purple-400"></span>
+                            <span class="text-purple-700 font-semibold">Semana 1: Seguridad y Estructura</span>
+                        </div>
+                        <div class="flex items-center gap-2 bg-orange-50/50 p-2.5 rounded-xl border border-orange-100">
+                            <span class="w-2.5 h-2.5 rounded-full bg-orange-400"></span>
+                            <span class="text-orange-700 font-semibold">Semana 2: Responsabilidad</span>
+                        </div>
+                        <div class="flex items-center gap-2 bg-pink-50/50 p-2.5 rounded-xl border border-pink-100">
+                            <span class="w-2.5 h-2.5 rounded-full bg-pink-400"></span>
+                            <span class="text-pink-700 font-semibold">Semana 3: Hábitos y Unión</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right panel: Active Day Details -->
+                <div class="bg-white p-6 rounded-3xl border border-purple-100 shadow-sm flex flex-col justify-between gap-6">
+                    <div class="space-y-5">
+                        <div class="border-b border-purple-50 pb-4">
+                            <span class="bg-orange-100 text-orange-700 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider inline-block mb-2" x-text="'Día ' + selectedChallengeDayNum + ' — Semana ' + Math.ceil(selectedChallengeDayNum / 7)"></span>
+                            <h4 class="font-display font-black text-lg text-purple-950" x-text="getActiveChallengeDay().title"></h4>
+                        </div>
+
+                        <!-- Objective -->
+                        <div class="space-y-1 bg-purple-50/50 p-4 rounded-xl border border-purple-100/50">
+                            <span class="text-[10px] font-black uppercase text-purple-500 block">Objetivo Diario</span>
+                            <p class="text-purple-900 text-xs font-semibold leading-relaxed" x-text="getActiveChallengeDay().objective"></p>
+                        </div>
+
+                        <!-- Action -->
+                        <div class="space-y-2">
+                            <span class="text-[10px] font-black uppercase text-orange-500 block">Tu Acción Práctica</span>
+                            <p class="text-purple-950 text-xs md:text-sm font-bold leading-relaxed" x-text="getActiveChallengeDay().task"></p>
+                        </div>
+
+                        <!-- Examples list -->
+                        <template x-if="getActiveChallengeDay().examples && getActiveChallengeDay().examples.length">
+                            <div class="space-y-2">
+                                <span class="text-[10px] font-black uppercase text-purple-400 block">Ejemplos Prácticos</span>
+                                <ul class="space-y-1 text-xs text-purple-900 pl-1">
+                                    <template x-for="ex in getActiveChallengeDay().examples" :key="ex">
+                                        <li class="flex gap-2 items-start font-medium">
+                                            <span class="text-orange-500 flex-shrink-0">👉</span>
+                                            <span x-text="ex"></span>
+                                        </li>
+                                    </template>
+                                </ul>
+                            </div>
+                        </template>
+
+                        <!-- Quote -->
+                        <template x-if="getActiveChallengeDay().quote">
+                            <div class="bg-orange-50/30 p-4 rounded-xl border border-dashed border-orange-200">
+                                <p class="text-purple-950 text-xs font-medium italic" x-text="'&quot;' + getActiveChallengeDay().quote + '&quot;'"></p>
+                            </div>
+                        </template>
+
+                        <!-- Journal entry reflections -->
+                        <div class="space-y-2 pt-2 border-t border-purple-50 no-print">
+                            <label class="text-[10px] font-black uppercase text-purple-500 flex justify-between">
+                                <span>Diario de Crianza Personal</span>
+                                <span class="text-[9px] text-purple-400 lowercase font-medium">autoguardado</span>
+                            </label>
+                            <textarea x-model="journalEntries[selectedChallengeDayNum]" @input="saveJournal()" placeholder="Escribe aquí tu reflexión sobre este día... ¿Qué tal funcionó la técnica con tus hijos?" class="w-full bg-purple-50 border border-purple-100 p-3 rounded-xl text-xs font-medium text-purple-950 placeholder-purple-300 focus:outline-none focus:ring-1 focus:ring-purple-400 h-20"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="no-print">
+                        <button @click="toggleChallengeDay(selectedChallengeDayNum, $event)"
+                                :class="getActiveChallengeDay().completed ? 'bg-red-500 hover:bg-red-600 text-white shadow-md' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-100'"
+                                class="w-full py-3.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all">
+                            <span x-text="getActiveChallengeDay().completed ? '❌ Marcar como Pendiente' : '✨ Completar Día de Hoy'"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chapter 3: Visual Routine Builder -->
+        <div x-show="activeTab === 'routines'" class="space-y-6" x-transition>
+            <!-- Tab select & Child mode triggers -->
+            <div class="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 bg-white/70 backdrop-blur-md p-4 rounded-2xl border border-purple-100 shadow-sm no-print">
+                <div class="flex bg-purple-50 p-1 rounded-xl w-full sm:w-auto">
+                    <template x-for="rTab in ['morning', 'afternoon', 'night']" :key="rTab">
+                        <button @click="selectedRoutineType = rTab"
+                                :class="selectedRoutineType === rTab ? 'bg-purple-600 text-white shadow' : 'text-purple-400 hover:text-purple-700'"
+                                class="flex-1 py-2 px-4 rounded-lg text-xs font-bold uppercase transition-all flex items-center justify-center gap-1.5 whitespace-nowrap">
+                            <span x-text="rTab === 'morning' ? '☀️ Mañana' : rTab === 'afternoon' ? '🌤️ Tarde' : '🌙 Noche'"></span>
+                        </button>
+                    </template>
+                </div>
+
+                <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <button @click="isChildModeActive = true"
+                            class="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-purple-600 hover:from-orange-600 hover:to-purple-700 text-white font-bold px-5 py-2.5 rounded-xl shadow-md flex items-center justify-center gap-2 transition-all hover:scale-102">
+                        <span>👁️ Pizarra Infantil (Modo Niños)</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Routine list builder col -->
+                <div class="lg:col-span-8 space-y-6">
+                    <!-- Current active routine items -->
+                    <div class="bg-white p-6 md:p-8 rounded-3xl border border-purple-100 shadow-sm space-y-6">
+                        <div class="flex justify-between items-center border-b border-purple-50 pb-4">
+                            <div>
+                                <h4 class="font-sans font-black text-lg text-purple-950 uppercase tracking-wide"
+                                    x-text="selectedRoutineType === 'morning' ? '☀️ Rutina de la Mañana' : selectedRoutineType === 'afternoon' ? '🌤️ Rutina de la Tarde' : '🌙 Rutina de la Noche'"></h4>
+                                <p class="text-purple-500 text-xs mt-1" x-text="selectedRoutineType === 'morning' ? 'Para salir de casa con tranquilidad, motivación y sin gritar.' : selectedRoutineType === 'afternoon' ? 'Para estructurar el regreso de la escuela con calma y juego.' : 'Para inducir la melatonina, relajar el cuerpo y evitar batallas para acostarse.'"></p>
+                            </div>
+                            <button @click="resetRoutineCheckboxes()" class="text-xs text-purple-500 hover:text-purple-700 underline font-semibold flex-shrink-0 no-print">
+                                Reiniciar Casillas
+                            </button>
+                        </div>
+
+                        <!-- Progress Bar of the active routine -->
+                        <div class="bg-purple-50 p-4 rounded-2xl border border-purple-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <span class="text-xs font-bold text-purple-700 uppercase">Progreso de la Rutina</span>
+                            <div class="flex items-center gap-3 w-full sm:w-2/3">
+                                <div class="w-full bg-purple-100 rounded-full h-2.5 overflow-hidden">
+                                    <div
+                                        :style="'width: ' + getRoutineProgressPercent() + '%'"
+                                        class="bg-purple-600 h-2.5 rounded-full transition-all duration-500"
+                                    ></div>
+                                </div>
+                                <span class="text-xs font-bold text-purple-950 flex-shrink-0" x-text="getRoutineCompletedCount() + ' / ' + getCurrentRoutineTasks().length"></span>
+                            </div>
+                        </div>
+
+                        <!-- Active tasks list with beautiful check circles and visual symbols -->
+                        <div class="space-y-3">
+                            <template x-for="(task, index) in getCurrentRoutineTasks()" :key="task.id">
+                                <div :class="task.completed ? 'bg-purple-50/60 border-purple-200/60 opacity-80' : 'bg-white border-purple-100 hover:shadow-sm'"
+                                     class="flex items-center justify-between p-4 rounded-2xl border transition-all">
+                                    <button @click="toggleRoutineTaskCompleted(task.id, $event)"
+                                            class="flex items-center gap-4 flex-1 text-left group">
+                                        <div class="text-purple-600 bg-purple-50 p-3 rounded-xl text-3xl font-bold flex items-center justify-center w-14 h-14" x-text="task.emoji"></div>
+                                        <div>
+                                            <span :class="task.completed ? 'line-through text-purple-400 font-medium' : 'text-purple-900 font-bold'"
+                                                  class="text-sm md:text-base block" x-text="task.text"></span>
+                                            <span class="text-[10px] text-purple-400 font-bold uppercase tracking-wider block mt-0.5" x-text="task.time"></span>
+                                        </div>
+                                    </button>
+
+                                    <div class="flex items-center gap-3">
+                                        <button @click="toggleRoutineTaskCompleted(task.id, $event)"
+                                                :class="task.completed ? 'text-purple-600' : 'text-purple-300 hover:text-purple-500'"
+                                                class="p-1.5 rounded-full transition-colors">
+                                            <span class="text-2xl" x-text="task.completed ? '🟢' : '⚪'"></span>
+                                        </button>
+                                        <button @click="deleteRoutineTask(task.id)" 
+                                                class="p-1.5 rounded-full text-purple-300 hover:text-red-500 hover:bg-red-50 transition-all no-print"
+                                                title="Eliminar tarea">
+                                            🗑️
+                                        </button>
+                                    </div>
+                                </div>
+                            </template>
+                            <template x-if="getCurrentRoutineTasks().length === 0">
+                                <div class="text-center py-8 bg-purple-50/30 rounded-2xl border border-dashed border-purple-100">
+                                    <p class="text-xs text-purple-400 font-semibold">No hay pasos agregados en esta rutina. ¡Crea uno abajo!</p>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Form to add new task with emoji visual symbol selector -->
+                        <form @submit.prevent="addRoutineTask()" class="bg-purple-50/40 p-5 rounded-2xl border border-purple-100/60 space-y-4 no-print">
+                            <h5 class="text-xs font-black text-purple-950 uppercase tracking-widest">Añadir Tarea Personalizada</h5>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                                <div class="md:col-span-6 space-y-1">
+                                    <label class="text-purple-600 text-[10px] font-bold uppercase block">Instrucción / Tarea</label>
+                                    <input x-model="newRoutineText" type="text" placeholder="Ej: Ponerse los zapatos" required class="w-full bg-white border border-purple-100 p-3 rounded-xl text-xs font-semibold text-purple-950 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                                </div>
+                                <div class="md:col-span-3 space-y-1">
+                                    <label class="text-purple-600 text-[10px] font-bold uppercase block">Hora sugerida</label>
+                                    <input x-model="newRoutineTime" type="text" placeholder="Ej: 8:00 AM" required class="w-full bg-white border border-purple-100 p-3 rounded-xl text-xs text-center font-semibold text-purple-950 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                                </div>
+                                <div class="md:col-span-3 flex items-end">
+                                    <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl text-xs py-3.5 shadow-sm transition-all uppercase tracking-wider">
+                                        + Agregar
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Clickable Visual Symbols/Emojis Grid for child's convenience -->
+                            <div class="space-y-1.5">
+                                <label class="text-purple-600 text-[10px] font-bold uppercase block">Símbolo Visual</label>
+                                <div class="grid grid-cols-6 sm:grid-cols-9 gap-2 bg-white p-3 rounded-xl border border-purple-100">
+                                    <template x-for="item in ['🌅', '☀️', '🌤️', '👕', '🥛', '🪥', '🎒', '📚', '🧸', '🛁', '🛌', '💤', '📖', '⏱️', '🔒', '🔔', '🍽️', '🧼']" :key="item">
+                                        <button
+                                            type="button"
+                                            @click="newRoutineEmoji = item"
+                                            :class="newRoutineEmoji === item ? 'bg-purple-100 ring-2 ring-purple-600 text-purple-800 scale-105 font-bold' : 'hover:bg-purple-50'"
+                                            class="h-10 rounded-lg flex items-center justify-center transition-all text-xl"
+                                        >
+                                            <span x-text="item"></span>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Info sidebar -->
+                <div class="lg:col-span-4 bg-white/70 backdrop-blur-md p-6 rounded-2xl border border-purple-100 shadow-sm flex flex-col justify-between no-print">
+                    <div class="space-y-4">
+                        <span class="text-xs font-black text-purple-950 uppercase tracking-widest block border-b border-purple-50 pb-2">Guía de Rutinas</span>
+                        <div class="space-y-3 text-purple-900 text-xs leading-relaxed">
+                            <p><strong>🧠 Anticipación Cerebral:</strong> A los niños les encanta saber qué viene después. Estructurar sus mañanas y noches con símbolos reduce la ansiedad y elimina la necesidad de dar órdenes repetitivas.</p>
+                            <p><strong>🎯 Autonomía Infantil:</strong> Al marcar sus logros en la pantalla o en una pizarra impresa, activan el centro de recompensa por logro personal en su cerebro, sintiendo propiedad sobre su tiempo.</p>
+                            <p><strong>🖨️ Hazlo tangible:</strong> Imprime la rutina diseñada usando el botón inferior y colócala en un lugar visible para que tu hijo/a pueda interactuar físicamente.</p>
+                        </div>
+                    </div>
+                    <button onclick="window.print()" class="mt-6 bg-purple-50 hover:bg-purple-100 border border-purple-100 text-purple-700 text-xs font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-1.5 transition-all w-full shadow-sm">
+                        🖨️ Imprimir Rutina Diseñada
+                    </button>
+                </div>
+            </div>
+
+            <!-- IMMERSIVE PIZARRA INFANTIL / CHILDREN WHITEBOARD MODE MODAL -->
+            <div x-show="isChildModeActive"
+                 class="fixed inset-0 bg-purple-950/95 backdrop-blur-md z-50 p-4 md:p-8 flex items-center justify-center overflow-y-auto no-print"
+                 x-transition>
+                <div class="bg-white w-full max-w-4xl rounded-3xl shadow-2xl p-6 md:p-8 border-4 border-purple-400 overflow-hidden flex flex-col justify-between max-h-[92vh]">
+                    <!-- Whiteboard Header -->
+                    <div class="flex justify-between items-center border-b-2 border-purple-100 pb-4 flex-shrink-0">
+                        <div class="flex items-center gap-3">
+                            <span class="text-4xl">🎉</span>
+                            <div>
+                                <h2 class="font-sans font-black text-2xl md:text-3xl text-purple-950 tracking-tight">¡Mi Pizarra de Logros!</h2>
+                                <p class="text-purple-600 font-bold text-xs md:text-sm mt-0.5">Selecciona los pasos que terminas para ganar estrellas.</p>
+                            </div>
+                        </div>
+                        <button @click="isChildModeActive = false"
+                                class="bg-purple-100 hover:bg-purple-200 text-purple-700 font-black px-5 py-2.5 rounded-xl text-xs transition-all uppercase tracking-wider">
+                            Regresar
+                        </button>
+                    </div>
+
+                    <!-- Whiteboard Content Grid -->
+                    <div class="flex-1 overflow-y-auto py-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <template x-for="task in getCurrentRoutineTasks()" :key="task.id">
+                            <button @click="toggleRoutineTaskCompleted(task.id, $event)"
+                                    :class="task.completed ? 'bg-emerald-50 border-emerald-400 text-emerald-800 scale-98 opacity-90 shadow-inner' : 'bg-white border-purple-200 hover:border-purple-300 text-purple-900 shadow-md hover:scale-101'"
+                                    class="p-5 rounded-2xl border-3 text-left flex items-center justify-between transition-all duration-200">
+                                <div class="flex items-center gap-4">
+                                    <span class="text-4xl p-3.5 bg-purple-50 rounded-2xl" x-text="task.emoji"></span>
+                                    <div>
+                                        <span :class="task.completed ? 'line-through opacity-70 font-medium' : 'font-extrabold'"
+                                              class="text-base md:text-lg block leading-tight" x-text="task.text"></span>
+                                        <span class="text-xs text-purple-400 font-bold block mt-1" x-text="task.time"></span>
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <template x-if="task.completed">
+                                        <span class="text-3xl">✅</span>
+                                    </template>
+                                    <template x-if="!task.completed">
+                                        <div class="w-8 h-8 rounded-full border-3 border-purple-300 bg-purple-50/50"></div>
+                                    </template>
+                                </div>
+                            </button>
+                        </template>
+                        <template x-if="getCurrentRoutineTasks().length === 0">
+                            <div class="col-span-full text-center py-12 bg-purple-50/50 rounded-2xl border border-dashed border-purple-200">
+                                <p class="text-purple-600 font-extrabold">¡No hay tareas agregadas en esta rutina!</p>
+                                <p class="text-purple-400 text-xs mt-1">Cierra la pizarra y agrega tus tareas en el panel de control.</p>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Star-Reward Progress Footer -->
+                    <div class="border-t-2 border-purple-100 pt-5 flex-shrink-0 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="flex gap-1 text-2xl">
+                                <template x-for="i in [1, 2, 3, 4, 5]">
+                                    <span :class="i <= Math.floor((getRoutineCompletedCount() / (getCurrentRoutineTasks().length || 1)) * 5) ? 'text-yellow-400 filter drop-shadow' : 'text-purple-200 grayscale opacity-40'"
+                                          class="transition-all duration-300">⭐</span>
+                                </template>
+                            </div>
+                            <span class="font-black text-purple-950 text-sm md:text-base"
+                                  x-text="'¡Tienes ' + getRoutineCompletedCount() + ' estrella' + (getRoutineCompletedCount() !== 1 ? 's' : '') + ' de ' + getCurrentRoutineTasks().length + '!'"></span>
+                        </div>
+
+                        <template x-if="getRoutineCompletedCount() === getCurrentRoutineTasks().length && getCurrentRoutineTasks().length > 0">
+                            <div class="bg-yellow-400 text-purple-950 font-black px-6 py-2.5 rounded-xl text-xs md:text-sm uppercase tracking-wider shadow flex items-center gap-1.5 animate-bounce">
+                                <span>✨ ¡Logro del día completado! 🥳 ✨</span>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chapter 4: S.O.S. Pataleta -->
+        <div x-show="activeTab === 'sos'" class="space-y-6" x-transition>
+            <template x-if="!isCrisisActive">
+                <!-- Normal / Safe Mode Panel -->
+                <div class="bg-gradient-to-br from-purple-900 to-indigo-950 p-8 rounded-3xl text-white border border-purple-800 text-center space-y-6 shadow-xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-orange-500 rounded-full blur-3xl opacity-15 -z-10"></div>
+                    <div class="absolute bottom-0 left-0 w-64 h-64 bg-purple-500 rounded-full blur-3xl opacity-15 -z-10"></div>
+
+                    <div class="max-w-lg mx-auto space-y-4">
+                        <div class="bg-red-500/10 text-red-400 p-3 rounded-full w-max mx-auto border border-red-500/20">
+                            <span class="text-2xl">🛡️</span>
+                        </div>
+                        <h2 class="font-sans font-extrabold text-3xl">Auxilio en Crisis: S.O.S. Pataleta</h2>
+                        <p class="text-purple-200 text-sm md:text-base leading-relaxed">
+                            ¿Tu hijo acaba de explotar? ¿Sientes que estás a punto de perder la paciencia? Presiona el botón de emergencia para entrar al regulador de crisis interactivo basado en el Método CALMA.
+                        </p>
+                    </div>
+
+                    <button
+                        @click="isCrisisActive = true"
+                        class="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-black px-8 py-5 rounded-2xl shadow-lg shadow-red-950/50 text-base md:text-lg uppercase tracking-wider transition-all scale-100 hover:scale-102 hover:shadow-red-500/20 inline-block"
+                    >
+                        🚨 Activar S.O.S. Pataleta
+                    </button>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left pt-6 border-t border-purple-800 text-xs text-purple-300">
+                        <div class="flex items-start gap-2.5">
+                            <span class="text-orange-400 font-bold">💡</span>
+                            <p><strong>El rincón de calma:</strong> úsalo como prevención regular cuando estén tranquilos, para que el niño conozca su rincón de paz.</p>
+                        </div>
+                        <div class="flex items-start gap-2.5">
+                            <span class="text-orange-400 font-bold">💡</span>
+                            <p><strong>Binaural hum integrado:</strong> al activar el modo S.O.S., puedes encender el hum de sonido relajante para inducir ondas cerebrales alfa en ti y en tu hijo.</p>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <template x-if="isCrisisActive">
+                <!-- Immersive Crisis Dashboard -->
+                <div class="bg-white rounded-3xl border-3 border-red-200 shadow-2xl p-6 md:p-8 flex flex-col md:flex-row gap-8">
+                    <!-- Visual Breathing Regulator Column -->
+                    <div class="md:w-1/3 flex flex-col items-center justify-between p-6 bg-purple-50/50 rounded-2xl border border-purple-100 relative overflow-hidden">
+                        <div class="text-center space-y-1 z-10">
+                            <span class="bg-red-100 text-red-700 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                                Control de Respiración
+                            </span>
+                            <p class="text-purple-600 text-xs">Regula tu pulso antes de corregir</p>
+                        </div>
+
+                        <!-- Breathing Ring -->
+                        <div class="my-8 relative flex items-center justify-center h-48 w-48">
+                            <!-- Outer pulse -->
+                            <div
+                                class="absolute inset-0 bg-purple-200 rounded-full opacity-30 transition-transform duration-[4000ms] ease-in-out"
+                                :style="'transform: scale(' + (breathState === 'Inhala' ? '1.4' : breathState === 'Retén' ? '1.4' : '1.0') + ')'"
+                            ></div>
+                            <!-- Inner ring -->
+                            <div
+                                class="absolute w-36 h-36 bg-purple-600 rounded-full shadow-lg flex flex-col items-center justify-center text-white transition-transform duration-[4000ms] ease-in-out"
+                                :style="'transform: scale(' + (breathState === 'Inhala' ? '1.25' : breathState === 'Retén' ? '1.25' : '1.0') + ')'"
+                            >
+                                <span class="text-2xl mb-1 animate-pulse">🌬️</span>
+                                <span class="font-extrabold text-lg uppercase tracking-wider" x-text="breathState"></span>
+                                <span class="text-[10px] text-purple-200">Aguanta el ritmo</span>
+                            </div>
+                        </div>
+
+                        <!-- Ambient Synthesizer Hum Player -->
+                        <div class="text-center w-full space-y-3 z-10">
+                            <button
+                                @click="toggleSound()"
+                                :class="soundActive ? 'bg-purple-600 border-purple-700 text-white animate-pulse' : 'bg-white border-purple-100 text-purple-700 hover:bg-purple-50'"
+                                class="w-full py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border transition-all"
+                            >
+                                <span x-text="soundActive ? '🔊 Apagar Sonido Hum' : '🔈 Encender Hum Relajante'"></span>
+                            </button>
+                            <p class="text-[10px] text-purple-400">Genera una micro-frecuencia armónica de 110Hz para inducir calma mental.</p>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Steps Guide Column -->
+                    <div class="md:w-2/3 flex flex-col justify-between gap-6">
+                        <!-- Header progress line -->
+                        <div class="flex items-center justify-between border-b border-purple-100 pb-4">
+                            <div class="flex items-center gap-2">
+                                <span class="text-red-500">⚠️</span>
+                                <h3 class="font-sans font-bold text-lg text-purple-950">Guía de Acción CALMA</h3>
+                            </div>
+                            <span class="text-xs font-bold text-red-600 uppercase" x-text="'Paso ' + activeStep + ' de 5'"></span>
+                        </div>
+
+                        <!-- Current Step Content -->
+                        <div class="space-y-4 py-2">
+                            <div>
+                                <h4 class="font-sans font-extrabold text-xl text-purple-900" x-text="getSosCurrentStepInfo().title"></h4>
+                                <p class="text-purple-500 text-xs font-semibold mt-0.5" x-text="getSosCurrentStepInfo().subtitle"></p>
+                            </div>
+
+                            <p class="text-purple-800 text-sm md:text-base leading-relaxed font-sans" x-text="getSosCurrentStepInfo().desc"></p>
+
+                            <!-- Guiding prompt speech box -->
+                            <div class="bg-orange-50 border-2 border-dashed border-orange-200 rounded-2xl p-4 flex gap-3 items-start">
+                                <span class="text-xl">🗣️</span>
+                                <div class="space-y-1">
+                                    <span class="text-[10px] font-bold text-orange-700 uppercase block tracking-wider">Tu voz para guiar</span>
+                                    <p class="text-purple-950 font-bold text-sm md:text-base italic">
+                                        "<span x-text="getSosCurrentStepInfo().prompt"></span>"
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer Navigation -->
+                        <div class="border-t border-purple-100 pt-5 flex items-center justify-between gap-4">
+                            <button
+                                @click="handleResetCrisis()"
+                                class="text-xs font-bold text-purple-400 hover:text-purple-700 transition-colors flex items-center gap-1"
+                            >
+                                🔄 Salir de S.O.S.
+                            </button>
+
+                            <div class="flex gap-2">
+                                <button
+                                    @click="handlePrevSosStep()"
+                                    :disabled="activeStep === 1"
+                                    class="px-4 py-2 rounded-xl border border-purple-100 hover:bg-purple-50 text-xs font-bold text-purple-700 disabled:opacity-40"
+                                >
+                                    Anterior
+                                </button>
+                                <template x-if="activeStep < 5">
+                                    <button
+                                        @click="handleNextSosStep()"
+                                        class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-5 py-2 rounded-xl text-xs"
+                                    >
+                                        Siguiente Paso
+                                    </button>
+                                </template>
+                                <template x-if="activeStep === 5">
+                                    <button
+                                        @click="handleResetCrisis(); triggerConfetti($event.clientX, $event.clientY)"
+                                        class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-6 py-2 rounded-xl text-xs flex items-center gap-1.5"
+                                    >
+                                        ❤️ ¡Crisis Superada!
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- Chapter 5: Responsibility Chart with star point board -->
+        <div x-show="activeTab === 'rewards'" class="space-y-6" x-transition>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Left Sidebar: Children & Surnames manager -->
+                <div class="lg:col-span-4 bg-white/70 backdrop-blur-md p-6 rounded-2xl border border-purple-100 shadow-sm flex flex-col gap-6">
+                    <!-- Family Surname block -->
+                    <div class="space-y-3">
+                        <span class="text-xs font-black text-purple-950 uppercase tracking-widest block border-b border-purple-50 pb-2">Tu Equipo Familiar</span>
+                        <div>
+                            <label class="text-[10px] uppercase font-black text-purple-400 block mb-1">Apellido de la Familia</label>
+                            <input x-model="familySurname" @input="saveChildren()" type="text" placeholder="Ej: González" class="w-full bg-purple-50 border border-purple-100 p-2.5 rounded-xl text-xs font-bold text-purple-950 focus:outline-none focus:ring-1 focus:ring-purple-400">
+                        </div>
+                    </div>
+
+                    <!-- Children listing and adding -->
+                    <div class="space-y-4">
+                        <span class="text-xs font-black text-purple-950 uppercase tracking-widest block border-b border-purple-50 pb-2 flex justify-between">
+                            <span>Hijos</span>
+                            <span class="text-[10px] text-purple-400" x-text="children.length + ' agregados'"></span>
+                        </span>
+                        <div class="space-y-2">
+                            <template x-for="child in children" :key="child.id">
+                                <button @click="selectedChildId = child.id"
+                                        :class="selectedChildId === child.id ? 'bg-purple-600 text-white border-purple-700 shadow-md scale-102' : 'bg-white hover:bg-purple-50 text-purple-950 border-purple-100'"
+                                        class="w-full p-3 rounded-xl border text-left font-bold text-xs md:text-sm transition-all flex justify-between items-center">
+                                    <span x-text="child.avatar + ' ' + child.name"></span>
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full" :class="selectedChildId === child.id ? 'bg-purple-500/20 text-white' : 'bg-purple-100 text-purple-700'" x-text="child.stars + ' ⭐'"></span>
+                                </button>
+                            </template>
+                        </div>
+
+                        <!-- Add new child form -->
+                        <form @submit.prevent="addChild()" class="space-y-2 pt-2 border-t border-purple-50">
+                            <label class="text-[10px] uppercase font-black text-purple-400 block">Agregar Nuevo Hijo/a</label>
+                            <div class="flex gap-2">
+                                <input x-model="newChildName" type="text" placeholder="Nombre" required class="flex-1 bg-purple-50 border border-purple-100 p-2.5 rounded-xl text-xs font-semibold text-purple-950 focus:outline-none focus:ring-1 focus:ring-purple-400">
+                                <input x-model="newChildAvatar" type="text" placeholder="👦" required class="w-12 text-center bg-purple-50 border border-purple-100 p-2.5 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-purple-400">
+                                <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-3.5 rounded-xl text-xs">
+                                    +
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Right Stage: Points tracker grid -->
+                <div class="lg:col-span-8 space-y-6">
+                    <template x-if="getSelectedChild()">
+                        <div class="space-y-6">
+                            <!-- Header with star counter -->
+                            <div class="bg-white p-6 rounded-3xl border border-purple-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-3xl" x-text="getSelectedChild().avatar"></span>
+                                    <div>
+                                        <h3 class="font-display font-black text-lg text-purple-950" x-text="'Tabla de Puntos de ' + getSelectedChild().name"></h3>
+                                        <p class="text-purple-400 text-[10px] uppercase font-black tracking-widest mt-0.5">Asigna y premia responsabilidades diarias</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="bg-yellow-50 px-4 py-2 rounded-2xl border border-yellow-200 text-center flex items-center gap-1.5 shadow-sm">
+                                        <span class="text-lg">⭐</span>
+                                        <span class="text-sm font-black text-purple-950" x-text="getSelectedChild().stars + ' estrellas'"></span>
+                                    </div>
+                                    <button @click="deleteChild(getSelectedChild().id)" class="bg-red-50 hover:bg-red-100 border border-red-100 text-red-600 p-2 rounded-xl text-xs no-print">
+                                        🗑️ Eliminar
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Tasks lists split panel -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Daily Tasks checklists -->
+                                <div class="bg-white p-5 rounded-2xl border border-purple-100 shadow-sm space-y-4">
+                                    <h4 class="text-xs font-bold text-purple-500 uppercase tracking-wider">Responsabilidades Diarias (1⭐ c/u)</h4>
+                                    <div class="space-y-2">
+                                        <template x-for="t in getSelectedChild().dailyTasks" :key="t.id">
+                                            <button @click="toggleDailyTask(t.id, $event)"
+                                                    :class="t.completed ? 'bg-emerald-50/50 border-emerald-200 text-emerald-800' : 'bg-white hover:bg-purple-50 border-purple-100 text-purple-900'"
+                                                    class="w-full p-3.5 rounded-xl border text-left flex items-center justify-between text-xs font-bold transition-all">
+                                                <span x-text="t.text"></span>
+                                                <span x-text="t.completed ? '⭐' : '⚪'"></span>
+                                            </button>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <!-- Weekly & Optional -->
+                                <div class="space-y-6">
+                                    <!-- Weekly task -->
+                                    <div class="bg-white p-5 rounded-2xl border border-purple-100 shadow-sm space-y-3">
+                                        <h4 class="text-xs font-bold text-purple-500 uppercase tracking-wider">Colaboración Semanal (3⭐)</h4>
+                                        <button @click="toggleWeeklyTask($event)"
+                                                :class="getSelectedChild().weeklyTask.completed ? 'bg-emerald-50/50 border-emerald-200 text-emerald-800' : 'bg-white hover:bg-purple-50 border-purple-100 text-purple-900'"
+                                                class="w-full p-4 rounded-xl border text-left flex items-center justify-between text-xs font-bold transition-all">
+                                            <div>
+                                                <span x-text="getSelectedChild().weeklyTask.text"></span>
+                                                <span class="text-[9px] text-purple-400 font-semibold uppercase tracking-wider block mt-1">Colaboración familiar grande</span>
+                                            </div>
+                                            <span x-text="getSelectedChild().weeklyTask.completed ? '⭐⭐⭐' : '⚪'"></span>
+                                        </button>
+                                    </div>
+
+                                    <!-- Optional task -->
+                                    <div class="bg-white p-5 rounded-2xl border border-purple-100 shadow-sm space-y-3">
+                                        <h4 class="text-xs font-bold text-purple-500 uppercase tracking-wider" x-text="'Tarea Opcional (+' + getSelectedChild().optionalTask.points + '⭐)'"></h4>
+                                        <button @click="toggleOptionalTask($event)"
+                                                :class="getSelectedChild().optionalTask.completed ? 'bg-emerald-50/50 border-emerald-200 text-emerald-800' : 'bg-white hover:bg-purple-50 border-purple-100 text-purple-900'"
+                                                class="w-full p-4 rounded-xl border text-left flex items-center justify-between text-xs font-bold transition-all">
+                                            <div>
+                                                <span x-text="getSelectedChild().optionalTask.text"></span>
+                                                <span class="text-[9px] text-purple-400 font-semibold uppercase tracking-wider block mt-1">Aventura de ayuda extra</span>
+                                            </div>
+                                            <span class="text-xs font-black bg-purple-100 text-purple-700 px-2.5 py-0.5 rounded-lg flex-shrink-0" x-text="getSelectedChild().optionalTask.completed ? 'Completado' : '+' + getSelectedChild().optionalTask.points + '⭐'"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Certificate view trigger -->
+                            <div class="bg-purple-950 text-white p-5 rounded-2xl border border-purple-800 flex justify-between items-center gap-4 no-print">
+                                <div class="space-y-0.5">
+                                    <span class="text-[10px] font-black uppercase text-orange-400 tracking-wider">Logro del Método CALMA</span>
+                                    <h4 class="font-sans font-black text-sm">Diploma de Crianza Respetuosa</h4>
+                                    <p class="text-purple-200 text-xs leading-normal">Genera e imprime un certificado oficial al acumular estrellas con tu familia.</p>
+                                </div>
+                                <button @click="showCertificate = true" class="bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-xs py-2 px-4 rounded-xl transition-colors">
+                                    🎓 Ver Diploma
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                    <template x-if="!getSelectedChild()">
+                        <p class="text-center py-16 text-purple-400 text-xs font-semibold">Crea un hijo/a en el panel lateral para empezar a registrar estrellas.</p>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Printable Certificate Popup Modal -->
+            <div x-show="showCertificate" class="fixed inset-0 bg-purple-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 overflow-y-auto" x-cloak>
+                <div class="bg-white text-purple-950 rounded-3xl p-6 md:p-10 max-w-2xl w-full border-4 border-double border-yellow-400 relative space-y-6 text-center shadow-2xl">
+                    <button @click="showCertificate = false" class="absolute right-4 top-4 text-purple-400 hover:text-purple-700 font-bold text-lg no-print">
+                        ✕
+                    </button>
+
+                    <div class="space-y-2">
+                        <span class="text-xs font-black text-orange-600 tracking-widest uppercase">Diploma Oficial</span>
+                        <h2 class="font-display font-black text-3xl text-purple-950">Familia <span x-text="familySurname || 'Equipo'"></span></h2>
+                    </div>
+
+                    <div class="border-y border-purple-100 py-6 max-w-md mx-auto space-y-4">
+                        <span class="text-xs uppercase font-bold text-purple-400">Otorgado con honor a:</span>
+                        <h3 class="font-display font-black text-2xl text-purple-900" x-text="getSelectedChild() ? getSelectedChild().name : 'Hijo/a'"></h3>
+                        <p class="text-xs text-purple-500 leading-relaxed max-w-sm mx-auto font-medium">
+                            Por su destacada participación en el programa de rutinas saludables familiares, colaborando como un gran jugador de equipo y demostrando gran responsabilidad y respeto en el hogar.
+                        </p>
+                    </div>
+
+                    <div class="flex justify-between items-center max-w-md mx-auto text-[10px] text-purple-400 uppercase font-black tracking-wider pt-4">
+                        <div class="text-center">
+                            <div class="h-0.5 w-24 bg-purple-100 mx-auto mb-1"></div>
+                            <span>Cuidadores Presentes</span>
+                        </div>
+                        <div class="text-center">
+                            <span class="text-2xl block mb-1">⭐</span>
+                            <span>Método CALMA</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2 justify-center pt-4 no-print">
+                        <button onclick="window.print()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs py-2 px-5 rounded-xl shadow">
+                            Imprimir Diploma
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chapter 6: Parent Coach Advisory -->
+        <div x-show="activeTab === 'coach'" class="space-y-6" x-transition>
+            <!-- Header for Parenting Advisor -->
+            <div class="bg-white/75 backdrop-blur-md p-6 rounded-2xl border border-purple-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-6" id="coach-offline-header">
+                <div class="space-y-1">
+                    <h3 class="font-sans font-black text-xl text-purple-950 flex items-center gap-2">
+                        <span>🧭</span>
+                        Asesor de Crianza CALMA
+                    </h3>
+                    <p class="text-purple-500 text-xs">
+                        Guía de acción interactiva 100% libre de inteligencia artificial. Herramientas prácticas e instantáneas basadas en el Método de Crianza Respetuosa.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Toggle Subtabs for Advisor: Planner (Caja de Herramientas) and Playbook (Camino Comparativo) -->
+            <div class="flex bg-purple-100/60 p-1 rounded-2xl border border-purple-200/50 max-w-lg mx-auto no-print">
+                <button @click="coachSubTab = 'planner'"
+                        :class="coachSubTab === 'planner' ? 'bg-purple-600 text-white shadow' : 'text-purple-600 hover:text-purple-800'"
+                        class="flex-1 py-2 rounded-xl text-xs font-bold uppercase transition-all">
+                    🧭 Solucionador de conflictos
+                </button>
+                <button @click="coachSubTab = 'playbook'"
+                        :class="coachSubTab === 'playbook' ? 'bg-purple-600 text-white shadow' : 'text-purple-600 hover:text-purple-800'"
+                        class="flex-1 py-2 rounded-xl text-xs font-bold uppercase transition-all">
+                    📚 Casos de Estudio
+                </button>
+                <button @click="coachSubTab = 'commitment'"
+                        :class="coachSubTab === 'commitment' ? 'bg-purple-600 text-white shadow' : 'text-purple-600 hover:text-purple-800'"
+                        class="flex-1 py-2 rounded-xl text-xs font-bold uppercase transition-all">
+                    💝 Mi Compromiso
+                </button>
+            </div>
+
+            <!-- GUIA PRÁCTICA SUBTAB -->
+            <div x-show="coachSubTab === 'planner'" class="grid grid-cols-1 lg:grid-cols-12 gap-8" x-transition>
+                <!-- Dropdown selection filter sidebar -->
+                <div class="lg:col-span-4 bg-white/70 backdrop-blur-md p-6 rounded-2xl border border-purple-100 shadow-sm flex flex-col gap-6">
+                    <!-- Conflict Dropdown selector -->
+                    <div class="space-y-3">
+                        <span class="text-xs font-black text-purple-950 uppercase tracking-widest block border-b border-purple-50 pb-2">1. Selecciona el Conflicto</span>
+                        <div class="space-y-2">
+                            <template x-for="conf in Object.values(conflictDatabase)" :key="conf.id">
+                                <button @click="selectedConflictId = conf.id"
+                                        :class="selectedConflictId === conf.id ? 'bg-purple-600 text-white border-purple-700 shadow-md scale-102' : 'bg-white hover:bg-purple-50 text-purple-900 border-purple-100'"
+                                        class="w-full p-3 rounded-xl border text-left transition-all flex items-start gap-3">
+                                    <span class="text-xl" x-text="conf.icon"></span>
+                                    <div class="truncate">
+                                        <span class="font-extrabold text-xs block leading-tight" x-text="conf.title"></span>
+                                        <span class="text-[10px] block truncate mt-0.5 font-medium" :class="selectedConflictId === conf.id ? 'text-purple-200' : 'text-purple-400'" x-text="conf.description"></span>
+                                    </div>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Child age selection -->
+                    <div class="space-y-3">
+                        <span class="text-xs font-black text-purple-950 uppercase tracking-widest block border-b border-purple-50 pb-2">2. Edad de tu Hijo/a</span>
+                        <div class="grid grid-cols-2 gap-2">
+                            <template x-for="age in ['0-2', '3-5', '6-9', '10+']" :key="age">
+                                <button @click="selectedCoachAge = age"
+                                        :class="selectedCoachAge === age ? 'bg-purple-600 text-white border-purple-700 shadow-md' : 'bg-white hover:bg-purple-50 text-purple-950 border-purple-100'"
+                                        class="p-2.5 rounded-xl border text-center transition-all flex flex-col justify-center items-center">
+                                    <span class="font-black text-xs block" x-text="age + ' Años'"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Parent emotion dropdown selector -->
+                    <div class="space-y-3">
+                        <span class="text-xs font-black text-purple-950 uppercase tracking-widest block border-b border-purple-50 pb-2">3. ¿Cómo te Sientes Tú?</span>
+                        <div class="grid grid-cols-2 gap-2">
+                            <template x-for="mood in [{id: 'stressed', label: 'Estresado/a', emoji: '⚡'}, {id: 'exhausted', label: 'Agotado/a', emoji: '🔋'}, {id: 'rushed', label: 'Con Prisa', emoji: '⏰'}, {id: 'calm', label: 'Tranquilo/a', emoji: '🧘'}]" :key="mood.id">
+                                <button @click="parentCoachMood = mood.id"
+                                        :class="parentCoachMood === mood.id ? 'bg-purple-600 text-white border-purple-700 shadow-md' : 'bg-white hover:bg-purple-50 text-purple-950 border-purple-100'"
+                                        class="p-2 rounded-xl border text-center transition-all flex items-center justify-center gap-1.5">
+                                    <span class="text-sm" x-text="mood.emoji"></span>
+                                    <span class="font-bold text-xs" x-text="mood.label"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Stage: Diagnostic results -->
+                <div class="lg:col-span-8 space-y-6">
+                    <!-- Science Tip Context card -->
+                    <div class="bg-gradient-to-r from-purple-900 to-indigo-950 rounded-2xl p-5 text-white border border-purple-800 shadow relative overflow-hidden">
+                        <div class="flex gap-4 items-start relative z-10">
+                            <div class="p-3 bg-white/10 rounded-xl text-yellow-300">
+                                💡
+                            </div>
+                            <div class="space-y-1">
+                                <span class="text-[10px] font-black uppercase text-orange-400 tracking-wider">La Ciencia Detrás del Berrinche</span>
+                                <h4 class="font-sans font-black text-sm md:text-base text-white" x-text="getCoachConflictInfo().title"></h4>
+                                <p class="text-purple-200 text-xs leading-relaxed" x-text="getCoachConflictInfo().scienceTip"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action protocol steps (C-A-L-M-A cards) -->
+                    <div class="space-y-4">
+                        <!-- C - Calmar -->
+                        <div class="bg-white rounded-2xl p-5 border border-purple-100 shadow-sm flex flex-col gap-3">
+                            <div class="flex flex-col md:flex-row gap-5 items-start">
+                                <div class="flex items-center justify-center bg-orange-100 text-orange-600 font-black text-2xl rounded-xl h-14 w-14 flex-shrink-0">
+                                    C
+                                </div>
+                                <div class="space-y-2 flex-1">
+                                    <h5 class="font-sans font-extrabold text-purple-950 text-base">Calmar (Tú Primero)</h5>
+                                    <p class="text-purple-900 text-xs md:text-sm leading-relaxed" x-text="getCoachMoodGuide()"></p>
+                                </div>
+                            </div>
+
+                            <!-- Breathing Bubble to meet user request -->
+                            <div class="bg-purple-50/50 rounded-xl p-4 border border-purple-100/30 flex flex-col sm:flex-row items-center justify-between gap-4 mt-3">
+                                <div class="space-y-1 text-center sm:text-left">
+                                    <span class="text-[10px] font-bold uppercase text-purple-700 tracking-wider block">Pacer de Respiración de Emergencia</span>
+                                    <p class="text-purple-900 text-xs">Sigue esta burbuja para auto-regular tu propio estado emocional antes de actuar.</p>
+                                </div>
+
+                                <div class="flex items-center gap-3">
+                                    <button
+                                        @click="isBreathingActive = !isBreathingActive"
+                                        class="bg-white hover:bg-purple-100 px-3 py-1.5 rounded-xl border border-purple-200 text-purple-700 text-xs font-bold transition-all"
+                                        x-text="isBreathingActive ? 'Pausar' : 'Iniciar'"
+                                    ></button>
+
+                                    <div class="relative flex items-center justify-center h-14 w-14">
+                                        <div
+                                            class="absolute inset-0 bg-purple-200 rounded-full opacity-40 transition-all duration-[4000ms] ease-in-out"
+                                            :style="'transform: scale(' + (isBreathingActive ? (breathState === 'Inhala' || breathState === 'Retén' ? 1.4 : 1.0) : 1.1) + ')'"
+                                        ></div>
+                                        <div class="relative bg-purple-600 rounded-full h-10 w-10 text-white font-extrabold text-[9px] flex items-center justify-center uppercase tracking-wider transition-all duration-[4000ms] ease-in-out"
+                                             :style="'transform: scale(' + (isBreathingActive ? (breathState === 'Inhala' || breathState === 'Retén' ? 1.25 : 1.0) : 1.1) + ')'">
+                                            <span x-text="breathState"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- A - Acompañar -->
+                        <div class="bg-white rounded-2xl p-5 border border-purple-100 shadow-sm flex flex-col md:flex-row gap-5">
+                            <div class="flex items-center justify-center bg-purple-100 text-purple-600 font-black text-2xl rounded-xl h-14 w-14 flex-shrink-0">
+                                A
+                            </div>
+                            <div class="space-y-3 flex-1">
+                                <h5 class="font-sans font-extrabold text-purple-950 text-base">Acompañar (Guía Emocional)</h5>
+                                <div class="bg-orange-50/50 border border-dashed border-orange-200 p-4 rounded-xl relative pt-6">
+                                    <span class="absolute top-1 left-2 bg-orange-100 text-orange-800 text-[9px] font-black uppercase px-2 py-0.5 rounded-full tracking-wider">Frase de co-regulación recomendada</span>
+                                    <p class="text-purple-950 font-bold text-sm md:text-base italic" x-text="'&quot;' + getCoachAgeTips().acompany + '&quot;'"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- L - Limitar con amor -->
+                        <div class="bg-white rounded-2xl p-5 border border-purple-100 shadow-sm flex flex-col md:flex-row gap-5">
+                            <div class="flex items-center justify-center bg-yellow-100 text-yellow-600 font-black text-2xl rounded-xl h-14 w-14 flex-shrink-0">
+                                L
+                            </div>
+                            <div class="space-y-2 flex-1">
+                                <h5 class="font-sans font-extrabold text-purple-950 text-base">Limitar con Amor</h5>
+                                <p class="text-purple-900 text-xs md:text-sm leading-relaxed font-semibold" x-text="getCoachAgeTips().limit"></p>
+                            </div>
+                        </div>
+
+                        <!-- M - Modelar -->
+                        <div class="bg-white rounded-2xl p-5 border border-purple-100 shadow-sm flex flex-col md:flex-row gap-5">
+                            <div class="flex items-center justify-center bg-teal-100 text-teal-600 font-black text-2xl rounded-xl h-14 w-14 flex-shrink-0">
+                                M
+                            </div>
+                            <div class="space-y-2 flex-1">
+                                <h5 class="font-sans font-extrabold text-purple-950 text-base">Modelar la Respuesta</h5>
+                                <p class="text-purple-900 text-xs md:text-sm leading-relaxed" x-text="getCoachAgeTips().model"></p>
+                            </div>
+                        </div>
+
+                        <!-- A - Activar rutinas -->
+                        <div class="bg-white rounded-2xl p-5 border border-purple-100 shadow-sm flex flex-col md:flex-row gap-5">
+                            <div class="flex items-center justify-center bg-blue-100 text-blue-600 font-black text-2xl rounded-xl h-14 w-14 flex-shrink-0">
+                                A
+                            </div>
+                            <div class="space-y-2 flex-1">
+                                <h5 class="font-sans font-extrabold text-purple-950 text-base">Activar Hábitos Predecibles</h5>
+                                <p class="text-purple-900 text-xs md:text-sm leading-relaxed" x-text="getCoachAgeTips().activate"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMPARATIVE PLAYBOOK SUBTAB -->
+            <div x-show="coachSubTab === 'playbook'" class="max-w-4xl mx-auto space-y-6" x-transition>
+                <div class="text-center max-w-xl mx-auto space-y-1">
+                    <h4 class="font-display font-black text-xl text-purple-950">⚖️ El Camino Reactivo vs. El Camino Respetuoso</h4>
+                    <p class="text-purple-500 text-xs leading-relaxed">Visualiza la diferencia biológica y conductual entre reaccionar bajo estrés y guiar bajo el método CALMA.</p>
+                </div>
+
+                <div class="space-y-6">
+                    <template x-for="item in playbook" :key="item.conflict">
+                        <div class="bg-white rounded-3xl border border-purple-100 shadow-sm p-6 space-y-4">
+                            <h5 class="text-sm font-black text-purple-950 uppercase tracking-wider border-b border-purple-50 pb-2 flex items-center gap-2">
+                                <span class="bg-purple-100 p-1.5 rounded-lg">✨</span>
+                                <span x-text="item.title"></span>
+                            </h5>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Reactive Path Card -->
+                                <div class="bg-red-50/50 p-4 rounded-2xl border border-red-100/50 space-y-2">
+                                    <h6 class="text-xs font-black text-red-700 flex items-center gap-1.5" x-text="'🚨 ' + item.reactiveTitle"></h6>
+                                    <p class="text-[11px] text-red-900 font-medium leading-relaxed" x-text="item.reactiveText"></p>
+                                </div>
+                                
+                                <!-- Respectful CALMA Path Card -->
+                                <div class="bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100/50 space-y-2">
+                                    <h6 class="text-xs font-black text-emerald-800 flex items-center gap-1.5" x-text="'🌱 ' + item.calmTitle"></h6>
+                                    <p class="text-[11px] text-emerald-950 font-semibold leading-relaxed" x-text="item.calmText"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- COMMITMENT SUBTAB -->
+            <div x-show="coachSubTab === 'commitment'" class="grid grid-cols-1 lg:grid-cols-12 gap-8" x-transition>
+                <!-- Form Editor (Col-span 5) -->
+                <div class="lg:col-span-5 bg-white/70 backdrop-blur-md p-6 rounded-2xl border border-purple-100 shadow-sm flex flex-col justify-between gap-6">
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-sans font-bold text-purple-950 text-base">Redacta tu Compromiso CALMA</h4>
+                            <p class="text-purple-500 text-xs mt-0.5">
+                                Establece un recordatorio físico para esos instantes de tensión. Imprímelo o guárdalo donde puedas verlo a diario.
+                            </p>
+                        </div>
+
+                        <div class="space-y-3">
+                            <textarea
+                                class="w-full h-32 p-3.5 rounded-xl border border-purple-100 bg-purple-50/20 text-sm text-purple-900 focus:outline-none focus:ring-2 focus:ring-purple-400 placeholder:text-purple-300 font-sans leading-relaxed"
+                                x-model="parentPledge"
+                                placeholder="Ej. Prometo respirar hondo tres veces y recordar que detrás de un berrinche hay un cerebro infantil pidiendo contención, no combate..."
+                            ></textarea>
+
+                            <div class="space-y-1.5">
+                                <span class="text-xs font-bold text-purple-700 block">Estilo visual:</span>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <button
+                                        type="button"
+                                        @click="pledgeDesign = 'vintage'"
+                                        :class="pledgeDesign === 'vintage' ? 'bg-purple-100 border-purple-300 text-purple-700' : 'bg-white border-purple-150 hover:bg-purple-50 text-purple-400'"
+                                        class="py-1.5 rounded-lg border text-xs font-bold transition-all"
+                                    >
+                                        Clásico
+                                    </button>
+                                    <button
+                                        type="button"
+                                        @click="pledgeDesign = 'modern'"
+                                        :class="pledgeDesign === 'modern' ? 'bg-purple-100 border-purple-300 text-purple-700' : 'bg-white border-purple-150 hover:bg-purple-50 text-purple-400'"
+                                        class="py-1.5 rounded-lg border text-xs font-bold transition-all"
+                                    >
+                                        Espacial
+                                    </button>
+                                    <button
+                                        type="button"
+                                        @click="pledgeDesign = 'minimal'"
+                                        :class="pledgeDesign === 'minimal' ? 'bg-purple-100 border-purple-300 text-purple-700' : 'bg-white border-purple-150 hover:bg-purple-50 text-purple-400'"
+                                        class="py-1.5 rounded-lg border text-xs font-bold transition-all"
+                                    >
+                                        Minimal
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button
+                                @click="savePledge()"
+                                class="w-full bg-purple-600 hover:bg-purple-700 text-white font-black py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all shadow-sm"
+                            >
+                                Guardar Compromiso
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Action hints -->
+                    <div class="bg-orange-50 border-2 border-dashed border-orange-200 rounded-xl p-4 flex gap-3 items-start text-xs text-orange-900">
+                        <span class="text-lg">🎯</span>
+                        <p>
+                            <strong>Consejo práctico:</strong> Coloca este compromiso en el refrigerador o cerca de la habitación de juegos para recordarlo cuando sientas que vas a perder los estribos.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Visual printable pledge board (Col-span 7) -->
+                <div class="lg:col-span-7 flex flex-col gap-4">
+                    <div class="flex justify-between items-center px-1">
+                        <span class="text-xs font-bold text-purple-500">Vista Previa de Impresión</span>
+                        <button
+                            onclick="window.print()"
+                            class="bg-purple-100 hover:bg-purple-200 text-purple-700 font-bold px-4 py-1.5 rounded-xl text-xs flex items-center gap-1 transition-colors no-print"
+                        >
+                            <span>🖨️ Imprimir Compromiso</span>
+                        </button>
+                    </div>
+
+                    <!-- Decorative Frame -->
+                    <div 
+                        :class="pledgeDesign === 'vintage' ? 'bg-orange-50/40 border-yellow-500/80 border-double p-10 font-serif text-purple-950' : pledgeDesign === 'modern' ? 'bg-gradient-to-br from-purple-900 to-indigo-950 border-purple-700 text-white font-sans' : 'bg-white border-purple-100 text-purple-950 font-sans'"
+                        class="flex-1 p-8 rounded-3xl text-center flex flex-col justify-between min-h-[350px] relative overflow-hidden shadow-sm border-4 transition-all"
+                    >
+                        <!-- Decorative ornaments for vintage card -->
+                        <template x-if="pledgeDesign === 'vintage'">
+                            <div>
+                                <div class="absolute top-3 left-3 text-lg text-yellow-600/70 font-serif">✿</div>
+                                <div class="absolute top-3 right-3 text-lg text-yellow-600/70 font-serif">✿</div>
+                                <div class="absolute bottom-3 left-3 text-lg text-yellow-600/70 font-serif">✿</div>
+                                <div class="absolute bottom-3 right-3 text-lg text-yellow-600/70 font-serif">✿</div>
+                            </div>
+                        </template>
+
+                        <div class="space-y-4">
+                            <span class="text-3xl block mx-auto">❤️</span>
+                            <h3 :class="pledgeDesign === 'modern' ? 'text-orange-300' : 'text-purple-950'" class="text-lg md:text-xl font-black uppercase tracking-widest">
+                                Mi Compromiso de Crianza CALMA
+                            </h3>
+                            <div :class="pledgeDesign === 'modern' ? 'bg-orange-400' : 'bg-purple-200'" class="w-20 h-0.5 mx-auto"></div>
+                        </div>
+
+                        <div class="py-6 max-w-md mx-auto">
+                            <p :class="pledgeDesign === 'modern' ? 'text-purple-100' : 'text-purple-900'" class="text-base md:text-lg italic leading-relaxed font-medium" x-text="'&quot;' + (savedPledge || 'Redacta tu compromiso a la izquierda para verlo aquí...') + '&quot;'">
+                            </p>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="border-t border-purple-200/50 pt-3 max-w-xs mx-auto">
+                                <span :class="pledgeDesign === 'modern' ? 'text-orange-300' : 'text-purple-700'" class="block text-xs font-bold uppercase tracking-wider">
+                                    Papá / Mamá Presente
+                                </span>
+                                <span class="text-[10px] text-purple-400 block mt-0.5">
+                                    Método CALMA • Umbral Mental
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer of the Application -->
+    <footer class="bg-purple-950 text-purple-200 border-t border-purple-900 py-8 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="text-center md:text-left space-y-1">
+                <span class="text-xs font-extrabold uppercase text-orange-400 tracking-wider">Umbral Mental • Rutina Familiar Positiva</span>
+                <p class="text-[11px] text-purple-300">Inspirado en investigaciones de disciplina positiva de Daniel Siegel, Adele Faber y Catherine Wallace.</p>
+            </div>
+            <div class="text-[11px] text-purple-400">
+                © 2026 Umbral Mental. Todos los derechos reservados.
+            </div>
+        </div>
+    </footer>
+
+    <!-- CSS Celebratory Particle overlays container -->
+    <div id="particle-overlay-box" class="fixed inset-0 pointer-events-none z-50 overflow-hidden no-print"></div>
+
+    <script>
+        // Non-reactive variables to prevent Alpine's Proxy wrapping of AudioContext and OscillatorNode
+        let offlineAudioCtx = null;
+        let offlineOscillators = null;
+
+        function appState() {
+            return {
+                activeTab: 'book',
+                tabs: [
+                    { id: 'book', label: 'Guía de Lectura', icon: '📖' },
+                    { id: 'challenge', label: 'Reto 21 Días', icon: '📅' },
+                    { id: 'routines', label: 'Rutinas Visuales', icon: '☀️' },
+                    { id: 'sos', label: 'S.O.S. Pataleta', icon: '🚨' },
+                    { id: 'rewards', label: 'Tabla de Puntos', icon: '🏆' },
+                    { id: 'coach', label: 'Asesor CALMA', icon: '🧭' }
+                ],
+                
+                // CENTRALIZED DESERIALIZED DATABASES INJECTED DYNAMICALLY
+                ebookSections: JSON.parse(decodeURIComponent(escape(atob("W3siaWQiOiJpbnRybyIsInRpdGxlIjoiSW50cm9kdWNjacOzbiIsInN1YnRpdGxlIjoiTcOhcyBjYWxtYSwgbcOhcyBjb25leGnDs24sIG3DoXMgY29vcGVyYWNpw7NuIiwiY29udGVudCI6WyJDcmlhciBubyBlcyBzZW5jaWxsby4gQ3JpYXIgZW4gdW4gbXVuZG8gYWNlbGVyYWRvLCBzYXR1cmFkbyBkZSBleGlnZW5jaWFzLCBwYW50YWxsYXMsIGhvcmFyaW9zIGNhw7N0aWNvcyB5IHJlc3BvbnNhYmlsaWRhZGVzIGluZmluaXRhcy4uLiBlcyBhw7puIG3DoXMgcmV0YWRvci4gTXVjaGFzIGZhbWlsaWFzIHNpZW50ZW4gcXVlIHZpdmVuIGVuIG1vZG8gc3VwZXJ2aXZlbmNpYSwgYXBhZ2FuZG8gaW5jZW5kaW9zIHRvZG9zIGxvcyBkw61hczogZGlzY3VzaW9uZXMgcG9yIGxhIG1hw7FhbmEsIHByaXNhcyBjb25zdGFudGVzLCB0YXJlYXMgYWN1bXVsYWRhcywgaG9yYXMgZGUgc3Vlw7FvIGluc3VmaWNpZW50ZXMgeSwgYWwgZmluYWwgZGVsIGTDrWEsIGVzYSBtZXpjbGEgZGUgY2Fuc2FuY2lvIHkgY3VscGEgcXVlIGFjb21wYcOxYSBhIHRhbnRvcyBwYWRyZXMuIiwiUGVybyBhcXXDrSBlc3TDoXMuIEJ1c2NhbmRvIHVuYSBmb3JtYSBkaXN0aW50YS4gVW5hIGZvcm1hIG3DoXMgYW1hYmxlLCBtw6FzIGNvbnNjaWVudGUgeSBtw6FzIGh1bWFuYSBkZSBndWlhciBhIHR1cyBoaWpvcy4iLCJFc3RlIGxpYnJvIG5hY2UganVzdGFtZW50ZSBwYXJhIGVzbzogcGFyYSByZWNvcmRhcnRlIHF1ZSBzw60gZXMgcG9zaWJsZSB0cmFuc2Zvcm1hciBsYSBjb252aXZlbmNpYSB5IGNvbnN0cnVpciB1biBob2dhciBkb25kZSBsYSBjYWxtYSBubyBzZWEgdW4gbWlsYWdybyBvY2FzaW9uYWwsIHNpbm8gdW4gZXN0aWxvIGRlIHZpZGEuIiwiTGFzIGZhbWlsaWFzIG5vIHNlIHRyYW5zZm9ybWFuIGNvbiBmcmFzZXMgbW90aXZhY2lvbmFsZXMgbmkgY29uIGNvbnNlam9zIHN1ZWx0b3MuIFNlIHRyYW5zZm9ybWFuIGNvbiBow6FiaXRvcy4gTGEgY2llbmNpYSBlcyBjbGFyYTogbG8gcXVlIHJlcGV0aW1vcyBjYWRhIGTDrWEgbW9kZWxhIG51ZXN0cm8gY29tcG9ydGFtaWVudG8sIG51ZXN0cmFzIGVtb2Npb25lcyB5IG51ZXN0cmFzIHJlbGFjaW9uZXMuIiwiVW4gZXN0dWRpbyBwdWJsaWNhZG8gcG9yIGVsIEpvdXJuYWwgb2YgRmFtaWx5IFBzeWNob2xvZ3kgKDIwMTgpIGVuY29udHLDsyBxdWUgbGFzIHJ1dGluYXMgZmFtaWxpYXJlcyBjb25zaXN0ZW50ZXMgZXN0w6FuIGFzb2NpYWRhcyBjb246IG1lam9yIGNvb3BlcmFjacOzbiBpbmZhbnRpbCwgbWVub3MgY29uZHVjdGFzIGRlc2FmaWFudGVzLCBtYXlvciBzZW5zYWNpw7NuIGRlIHNlZ3VyaWRhZCBlbW9jaW9uYWwgeSBwYWRyZXMgbWVub3MgZXN0cmVzYWRvcy4iXSwiaGlnaGxpZ2h0ZWRRdW90ZXMiOlsiTGEgcnV0aW5hIGVzIGVsIGxlbmd1YWplIHNpbGVuY2lvc28gZGVsIGFtb3IuIEN1YW5kbyBjcmVhcyBow6FiaXRvcyBzYWx1ZGFibGVzLCBsZSBkaWNlcyBhIHR1IGZhbWlsaWE6ICdUZSBjdWlkby4gVGUgc29zdGVuZ28uIFRlIGRveSBlc3RhYmlsaWRhZCcuIiwiTm8gbmVjZXNpdGFzIGhhY2VybG8gcGVyZmVjdG8uIFNvbG8gbmVjZXNpdGFzIGVtcGV6YXIuIEVsIHByb2dyZXNvIGVzIG3DoXMgaW1wb3J0YW50ZSBxdWUgbGEgcGVyZmVjY2nDs24uIl0sImtleVRha2Vhd2F5cyI6WyJNZW5vcyBkaXNjdXNpb25lcyBlbiBsYXMgbWHDsWFuYXMiLCJNw6FzIGNvb3BlcmFjacOzbiBzaW4gcmVwZXRpciBpbnN0cnVjY2lvbmVzIGNvbnN0YW50ZW1lbnRlIiwiTWVub3MgcGF0YWxldGFzIHkgbWF5b3IgcmVndWxhY2nDs24gZW1vY2lvbmFsIiwiTm9jaGVzIG3DoXMgdHJhbnF1aWxhcyB5IG9yZ2FuaXphZGFzIiwiVW4gYW1iaWVudGUgbcOhcyBjYWxtYWRvIHkgY29uZWN0YWRvIGVuIHR1IGhvZ2FyIl19LHsiaWQiOiJtZXRvZG8tY2FsbWEiLCJ0aXRsZSI6IkVsIE3DqXRvZG8gQ0FMTUHihKIiLCJzdWJ0aXRsZSI6IkxhIGJhc2UgZGUgdW5hIHJ1dGluYSBmYW1pbGlhciBwb3NpdGl2YSIsImNvbnRlbnQiOlsiRWwgTcOpdG9kbyBDQUxNQeKEoiBlcyB1biBlbmZvcXVlIGRpc2XDsWFkbyBwYXJhIGF5dWRhcnRlIGEgdHJhbnNmb3JtYXIgbGEgZGluw6FtaWNhIGRlIHR1IGhvZ2FyIGRlc2RlIGxhIHJhw616LCBzaW4gZ3JpdG9zLCBzaW4gY2FzdGlnb3MgeSBzaW4gZXhpZ2lydGUgcGVyZmVjY2nDs24uIiwiQyDigJQgQ2FsbWFyOiBBbnRlcyBkZSBjb3JyZWdpciwgbmVjZXNpdGFzIHJlZ3VsYXJ0ZS4gVW4gYWR1bHRvIGNhbG1hZG8gY3JlYSB1biBlbnRvcm5vIHNlZ3Vyby4iLCJBIOKAlCBBY29tcGHDsWFyOiBMb3MgbmnDsW9zIG5vIG5lY2VzaXRhbiBjb250cm9sIGNvbnN0YW50ZSwgbmVjZXNpdGFuIGd1w61hIGVtb2Npb25hbC4iLCJMIOKAlCBMaW1pdGFyIGNvbiBhbW9yOiBMb3MgbMOtbWl0ZXMgbm8gZGVzYXBhcmVjZW4sIHNlIHRyYW5zZm9ybWFuLiBTb24gY2xhcm9zLCBmaXJtZXMgeSByZXNwZXR1b3Nvcy4iLCJNIOKAlCBNb2RlbGFyOiBUdXMgaGlqb3MgYXByZW5kZW4gbcOhcyBkZSBsbyBxdWUgaGFjZXMgcXVlIGRlIGxvIHF1ZSBkaWNlcy4iLCJBIOKAlCBBY3RpdmFyIHJ1dGluYXM6IExhIGVzdHJ1Y3R1cmEgZGlhcmlhIHJlZHVjZSBlbCBjYW9zIHkgZmFjaWxpdGEgbGEgY29vcGVyYWNpw7NuLiIsIkxhIG5ldXJvY2llbnTDrWZpY2EgRHJhLiBMaXNhIEZlbGRtYW4tQmFycmV0dCBleHBsaWNhIHF1ZSBlbCBjZXJlYnJvIGluZmFudGlsIGHDum4gZXN0w6EgZm9ybWFuZG8gbG9zIGNpcmN1aXRvcyBxdWUgcGVybWl0ZW4gcmVndWxhciBlbW9jaW9uZXMsIGNvbnRyb2xhciBpbXB1bHNvcywgdG9sZXJhciBsYSBmcnVzdHJhY2nDs24sIHBsYW5pZmljYXIgeSBzZWd1aXIgaW5zdHJ1Y2Npb25lcy4iLCJQb3IgZXNvLCBsYSBlc3RydWN0dXJhIGV4dGVybmEg4oCUbGFzIHJ1dGluYXMsIGxvcyBsw61taXRlcyBjbGFyb3MsIGxhcyBwYXV0YXMgY29uc2lzdGVudGVz4oCUIGZ1bmNpb25hIGNvbW8gdW4gYW5kYW1pYWplIGVtb2Npb25hbC4gQ3VhbmRvIGVsIGFtYmllbnRlIGVzIHByZWRlY2libGUsIGVsIGNlcmVicm8gZGVsIG5pw7FvIHNlIGNhbG1hLiBDdWFuZG8gZWwgYWR1bHRvIG1vZGVsYSBjYWxtYSwgZWwgbmnDsW8gYXByZW5kZSBhIGF1dG9ycmVndWxhcnNlLiBDdWFuZG8gbG9zIGTDrWFzIHRpZW5lbiB1bmEgc2VjdWVuY2lhIGNvbXByZW5zaWJsZSwgbGEgY29vcGVyYWNpw7NuIGZsdXllIGRlIG1hbmVyYSBuYXR1cmFsLiJdLCJoaWdobGlnaHRlZFF1b3RlcyI6WyJMb3MgbmnDsW9zIG5vICdzZSBwb3J0YW4gbWFsJy4gU2UgZGVzYm9yZGFuIHBvcnF1ZSBzdSBjZXJlYnJvIGVzdMOhIGVuIHBsZW5vIGRlc2Fycm9sbG8uIiwiTG9zIG5pw7FvcyBuZWNlc2l0YW4gbMOtbWl0ZXMsIG5vIGNvbW8gY2FzdGlnbywgc2lubyBjb21vIHByb3RlY2Npw7NuIGVtb2Npb25hbC4g4oCUIERhbiBTaWVnZWwsIG5ldXJvcHNpcXVpYXRyYS4iXX0seyJpZCI6Im1vZHVsby0xIiwidGl0bGUiOiJNw7NkdWxvIDE6IFRyYW5zZm9ybWEgbGEgQ29udml2ZW5jaWEgRmFtaWxpYXIiLCJzdWJ0aXRsZSI6IkVsIHBvZGVyIGRlIGxhcyBydXRpbmFzIHBvc2l0aXZhcyIsIm1vZHVsZU51bWJlciI6MSwiY29udGVudCI6WyJVbmEgcnV0aW5hIG5vIGVzIHNpbXBsZW1lbnRlIHVuYSBsaXN0YSBkZSB0YXJlYXMuIEVzIHVuYSBlc3RydWN0dXJhIGVtb2Npb25hbCBxdWUgc29zdGllbmUgbGEgdmlkYSBmYW1pbGlhciB5IGJyaW5kYSBhIGxvcyBuacOxb3Mg4oCUeSBhIGxvcyBhZHVsdG9z4oCUIHVuYSBzZW5zYWNpw7NuIHByb2Z1bmRhIGRlIHNlZ3VyaWRhZCwgcHJldmlzaWJpbGlkYWQgeSBwZXJ0ZW5lbmNpYS4iLCJEZSBhY3VlcmRvIGNvbiBpbnZlc3RpZ2FjaW9uZXMgZGUgbGEgQW1lcmljYW4gQWNhZGVteSBvZiBQZWRpYXRyaWNzLCBsb3MgbmnDsW9zIHF1ZSBjcmVjZW4gY29uIHJ1dGluYXMgZXN0YWJsZXMgbXVlc3RyYW4gbWF5b3IgYXV0b2VzdGltYSwgbWVub3MgYW5zaWVkYWQsIG1lam9yIHJlZ3VsYWNpw7NuIHkgbWVqb3IgcmVuZGltaWVudG8gYWNhZMOpbWljby4iLCJMYSByYXrDs24gZXMgc2ltcGxlOiBjdWFuZG8gbG9zIG5pw7FvcyBzYWJlbiBxdcOpIGVzcGVyYXIsIHN1IGNlcmVicm8gc2Ugc2llbnRlIHNlZ3Vyby4gTGEgc2VndXJpZGFkIG1lbnRhbCBkaXNtaW51eWUgZWwgZXN0csOpcyB5IGFicmUgZXNwYWNpbyBwYXJhIGxhIGNvbGFib3JhY2nDs24sIGxhIGNyZWF0aXZpZGFkIHkgZWwgYnVlbiBjb21wb3J0YW1pZW50by4iLCLCv1F1w6kgZXMgcmVhbG1lbnRlIHVuYSAncnV0aW5hIGZhbWlsaWFyIHBvc2l0aXZhJz8gRXMgdW5hIHNlY3VlbmNpYSBkaWFyaWEgZGUgYWN0aXZpZGFkZXMgZGlzZcOxYWRhIHBhcmEgZm9ydGFsZWNlciBsYSBjb252aXZlbmNpYSwgcmVkdWNpciBlbCBjYW9zIHkgcHJvbW92ZXIgbGEgY29sYWJvcmFjacOzbi4gTm8gc2UgdHJhdGEgZGUgaG9yYXJpb3MgcsOtZ2lkb3MsIHNpbm8gZGUgcml0bW9zIHNhbHVkYWJsZXMuIiwiTGFzIHJ1dGluYXMgbm8gc29sbyBvcmdhbml6YW4gZWwgZMOtYTogb3JnYW5pemFuIGxhcyBlbW9jaW9uZXMuIEVzdG8gc3VjZWRlIHBvcnF1ZSBsYXMgcnV0aW5hcyBmb3J0YWxlY2VuIGxhIGNvcnRlemEgcHJlZnJvbnRhbCBkZWwgY2VyZWJybywgZW5jYXJnYWRhIGRlIGxhIHBsYW5pZmljYWNpw7NuIHkgbGEgcmVndWxhY2nDs24gZW1vY2lvbmFsLiBBIG5pdmVsIGZhbWlsaWFyLCBlbCBiZW5lZmljaW8gZXMgZW5vcm1lOiBtZW5vcyBncml0b3MsIG1lbm9zIGVzdHLDqXMgeSBtw6FzIGFybW9uw61hLiIsIlVuIGVqZW1wbG8gcHLDoWN0aWNvIHNlIHZlIGVuIGxhIHRyYW5zaWNpw7NuIGRlIHVuICdjYW9zIG1hdHV0aW5vJyBhICdtYcOxYW5hcyBmbHVpZGFzJzogYW50ZXMgZGUgaW1wbGVtZW50YXIgbGEgcnV0aW5hLCBlbCBuacOxbyBubyBxdWVyw61hIGxldmFudGFyc2UsIGRlc2F5dW5hYmEgYSBtZWRpYXMsIG9sdmlkYWJhIGVsIG1hdGVyaWFsIHkgbGEgc2FsaWRhIGRlIGNhc2EgZXJhIGVzdHJlc2FudGUgYW50ZXMgZGUgbGFzIDggYS5tLiBEZXNwdcOpcyBkZSBpbXBsZW1lbnRhciB1bmEgcnV0aW5hIHBvc2l0aXZhIGNvbiB1biAnY2hlY2tsaXN0IHZpc3VhbCcgZGUgNSBwYXNvcyAodmVzdGlyLCBkZXNheXVuYXIsIGNlcGlsbGFyIGRpZW50ZXMsIG1vcnJhbCwgemFwYXRvcyksIGVsIG5pw7FvIHNhYmUgZXhhY3RhbWVudGUgcXXDqSBoYWNlciwgeSBsYSBzYWxpZGEgc2UgdnVlbHZlIHRyYW5xdWlsYS4iXSwiaGlnaGxpZ2h0ZWRRdW90ZXMiOlsiTGEgZXN0cnVjdHVyYSBubyBsaW1pdGEgYSBsb3MgbmnDsW9zOyBsZXMgYnJpbmRhIGxhIGxpYmVydGFkIGVtb2Npb25hbCBwYXJhIGNyZWNlci4g4oCUIERhbmllbCBKLiBTaWVnZWwsIGF1dG9yIGRlIFRoZSBXaG9sZS1CcmFpbiBDaGlsZC4iXSwia2V5VGFrZWF3YXlzIjpbIkFwb3J0YSBjbGFyaWRhZDogVG9kb3Mgc2FiZW4gcXXDqSBoYWNlciB5IGN1w6FuZG8uIiwiUmVkdWNlIGNvbmZsaWN0b3M6IE1lbm9zIGRpc2N1c2lvbmVzIGlubmVjZXNhcmlhcy4iLCJSZWZ1ZXJ6YSBjb29wZXJhY2nDs246IFRvZG9zIHBhcnRpY2lwYW4gY29tbyBlcXVpcG8uIiwiRm9tZW50YSBhdXRvbm9tw61hOiBMb3MgbmnDsW9zIGRlc2Fycm9sbGFuIGluZGVwZW5kZW5jaWEuIiwiTWVqb3JhIGNvbXVuaWNhY2nDs246IEZvcnRhbGVjZSB2w61uY3Vsb3MgYWZlY3Rpdm9zLiJdfSx7ImlkIjoibW9kdWxvLTIiLCJ0aXRsZSI6Ik3Ds2R1bG8gMjogVHUgSGlqbyBSZXNwb25zYWJsZSB5IENvbGFib3JhZG9yIiwic3VidGl0bGUiOiJDw7NtbyBndWlhciBzaW4gZ3JpdGFyIHkgZW5zZcOxYXIgc2luIHBlbGVhciIsIm1vZHVsZU51bWJlciI6MiwiY29udGVudCI6WyJMYSByZXNwb25zYWJpbGlkYWQgbm8gZXMgdW4gdGFsZW50byBuaSB1biAnZG9uIG5hdHVyYWwnLiBFcyB1bmEgaGFiaWxpZGFkIHF1ZSBzZSBhcHJlbmRlLCBpZ3VhbCBxdWUgbGVlciwgZXNjcmliaXIgbyBtb250YXIgZW4gYmljaWNsZXRhLiIsIlNlZ8O6biBlc3R1ZGlvcyBkZWwgQ2VudGVyIG9uIHRoZSBEZXZlbG9waW5nIENoaWxkIGRlIEhhcnZhcmQsIGxvcyBuacOxb3MgZGVzYXJyb2xsYW4gcmVzcG9uc2FiaWxpZGFkIGN1YW5kbyBzZSBmb3J0YWxlY2VuIHRyZXMgY2FwYWNpZGFkZXMgY2xhdmU6IENvbnRyb2wgaW5oaWJpdG9yaW8gKHJlc2lzdGlyIGltcHVsc29zIHkgcGVuc2FyIGFudGVzIGRlIGhhYmxhciksIE1lbW9yaWEgZGUgdHJhYmFqbyAocmVjb3JkYXIgaW5zdHJ1Y2Npb25lcyB5IHNlZ3VpciBwYXNvcykgeSBGbGV4aWJpbGlkYWQgY29nbml0aXZhIChhZGFwdGFyc2UgYSBjYW1iaW9zIHkgcmVzb2x2ZXIgcHJvYmxlbWFzKS4iLCJFc3RhcyBoYWJpbGlkYWRlcyBubyBhcGFyZWNlbiBzb2xhczogc2UgY29uc3RydXllbiBjb24gcmVwZXRpY2nDs24sIGd1w61hIHkgZXhwZWN0YXRpdmFzIGNsYXJhcy4iLCJBbnRlcyBkZSBzZW50aXIgZnJ1c3RyYWNpw7NuLCBlcyBjbGF2ZSBlbnRlbmRlciBwb3IgcXXDqSB0dSBoaWpvIHBhcmVjZSAnbm8gZXNjdWNoYXInLiBHZW5lcmFsbWVudGUsIGxvcyBuacOxb3MgZGVzb2JlZGVjZW4gcG9ycXVlIG5vIHNhYmVuIGV4YWN0YW1lbnRlIHF1w6kgc2UgZXNwZXJhLCByZWNpYmVuIG3Dumx0aXBsZXMgaW5zdHJ1Y2Npb25lcyBhIGxhIHZleiwgc2llbnRlbiBsYSBvcmRlbiBjb21vIHVuYSAnaW1wb3NpY2nDs24nIHLDrWdpZGEgbyBzdSBjZXJlYnJvIGVzdMOhIHNpbXBsZW1lbnRlIHNhdHVyYWRvIG8gZGlzdHJhw61kby4iLCJMYSBmw7NybXVsYSBkZSBsYSByZXNwb25zYWJpbGlkYWQgY29uc3RhIGRlIHRyZXMgcGlsYXJlczoiLCIxLiBDbGFyaWRhZDogTG9zIG5pw7FvcyBuZWNlc2l0YW4gaW5zdHJ1Y2Npb25lcyBzaW1wbGVzIHkgdmlzdWFsZXMuIEVuIHZleiBkZSBkZWNpciAnwqFPcmdhbml6YSB0dSBjdWFydG8geWEhJywgZGkgJ0d1YXJkYSB0dXMganVndWV0ZXMgZW4gbGEgY2FqYSBhenVsJy4iLCIyLiBDb25zdGFuY2lhOiBSZXBldGlyIGxhIGV4cGVjdGF0aXZhIGRpYXJpYW1lbnRlIGNyZWEgZWwgaMOhYml0by4gVmFsZSBtw6FzIHF1ZSB1biBkaXNjdXJzbyBtb3RpdmFjaW9uYWwuIiwiMy4gQ29uZXhpw7NuOiBMb3MgbmnDsW9zIGNvbGFib3JhbiBtw6FzIGN1YW5kbyBzZSBzaWVudGVuIHZpc3RvcywgZXNjdWNoYWRvcyB5IHZhbG9yYWRvcy4gVW4gYWJyYXpvLCB1bmEgbWlyYWRhIGPDoWxpZGEgbyB1biAnwr9sbyBoYWNlbW9zIGp1bnRvcz8nIGNhbWJpYSB0b2RhIGxhIGRpbsOhbWljYS4iLCJUYXJlYXMgcmVjb21lbmRhZGFzIHBvciBlZGFkIHNlZ8O6biBsYSBBbWVyaWNhbiBBY2FkZW15IG9mIENoaWxkICYgQWRvbGVzY2VudCBQc3ljaGlhdHJ5OiIsIi0gTmnDsW9zIGRlIDIgYSA0IGHDsW9zOiBHdWFyZGFyIGp1Z3VldGVzLCBwb25lciByb3BhIHN1Y2lhIGVuIGVsIGNlc3RvLCBheXVkYXIgYSBsbGV2YXIgdG9hbGxpdGFzIGEgc3UgbHVnYXIuIiwiLSBOacOxb3MgZGUgNSBhIDcgYcOxb3M6IFRlbmRlciBzdSBjYW1hIGNvbiBheXVkYSwgcG9uZXIgY29zYXMgc2VuY2lsbGFzIGVuIGxhIG1lc2EsIGFsaW1lbnRhciBtYXNjb3RhcyBjb24gc3VwZXJ2aXNpw7NuLiIsIi0gTmnDsW9zIGRlIDggYSAxMCBhw7FvczogQXJyZWdsYXIgc3UgY2FtYSBzb2xvcywgbGltcGlhciBzdSB6b25hIGRlIGVzdHVkaW8sIGRvYmxhciByb3BhIGbDoWNpbCwgcHJlcGFyYXIgc25hY2tzIHNpbXBsZXMuIiwiLSBOacOxb3MgZGUgMTAgYSAxMiBhw7FvczogSGFjZXIgdGFyZWFzIGRvbcOpc3RpY2FzIGNvbXBsZXRhcyAoYmFycmVyLCBsYXZhciBwbGF0b3MpLCBwcmVwYXJhciBkZXNheXVub3Mgc2VuY2lsbG9zLCBnZXN0aW9uYXIgc3UgbW9jaGlsYS4iLCJOaW5ndW5hIHRhcmVhIGRlYmUgdmVyc2UgY29tbyBjYXN0aWdvLCBzaW5vIGNvbW8gdW5hIHZhbGlvc2EgcGFydGljaXBhY2nDs24gZmFtaWxpYXIuIl0sImhpZ2hsaWdodGVkUXVvdGVzIjpbIkxvcyBuacOxb3MgY29vcGVyYW4gY3VhbmRvIHNlIHNpZW50ZW4gY29uZWN0YWRvcywgbm8gY3VhbmRvIHNlIHNpZW50ZW4gY29udHJvbGFkb3MuIOKAlCBBZGVsZSBGYWJlci4iLCJVbiBuacOxbyBhbCBxdWUgbGUgY29uZsOtYXMgcmVzcG9uc2FiaWxpZGFkZXMgc2UgY29udmllcnRlIGVuIHVuIGFkdWx0byBxdWUgY29uZsOtYSBlbiBzw60gbWlzbW8uIl0sImtleVRha2Vhd2F5cyI6WyJVc2EgY2hlY2tsaXN0cyB2aXN1YWxlczogTG9zIG5pw7FvcyByZXNwb25kZW4gbWVqb3IgYSBsbyBxdWUgdmVuIHF1ZSBhIGxvIHF1ZSBlc2N1Y2hhbi4iLCJEYSB1bmEgc29sYSBpbnN0cnVjY2nDs24gYSBsYSB2ZXogcGFyYSBubyBjb2xhcHNhciBzdSBtZW1vcmlhIGRlIHRyYWJham8uIiwiT2ZyZWNlIG9wY2lvbmVzIGd1aWFkYXM6IERhciBvcGNpb25lcyBhdW1lbnRhIGxhIGNvb3BlcmFjacOzbiBlbiB1biA2MCUgKGVqLiAnwr9RdWllcmVzIGVtcGV6YXIgcG9yIGxvcyB6YXBhdG9zIG8gcG9yIGxhIG1vY2hpbGE/JykuIiwiQXBsaWNhIGFjb21wYcOxYW1pZW50byBwcm9ncmVzaXZvOiBQYXNvIGEgcGFzbyBwYXNhcyBkZSBoYWNlcmxvIGp1bnRvcywgYSBzdXBlcnZpc2FyLCBhIG9ic2VydmFyIGRlc2RlIGxlam9zLiIsIlJlZnVlcnphIGVsIGVzZnVlcnpvLCBubyBsYSBwZXJmZWNjacOzbjogTGEgbW90aXZhY2nDs24gaW50ZXJuYSBjcmVjZSBhbCByZWNvbm9jZXIgZWwgcHJvY2Vzby4iXX0seyJpZCI6Im1vZHVsby0zIiwidGl0bGUiOiJNw7NkdWxvIDM6IEFkacOzcyBhIGxhcyBQYXRhbGV0YXMiLCJzdWJ0aXRsZSI6Ikd1w61hIHByw6FjdGljYSBwYXJhIGNhbG1hciBlbCBjYW9zIHkgZm9ydGFsZWNlciBsYSBjb25leGnDs24iLCJtb2R1bGVOdW1iZXIiOjMsImNvbnRlbnQiOlsiTGFzIHBhdGFsZXRhcyBzb24gdW5hIGRlIGxhcyBleHBlcmllbmNpYXMgbcOhcyBmcnVzdHJhbnRlcyBwYXJhIHBhZHJlcyB5IG1hZHJlcy4gUGVybyBlcyBpbXBvcnRhbnRlIGVudGVuZGVyIGxvIHNpZ3VpZW50ZTogbGFzIHBhdGFsZXRhcyBubyBzb24gdW4gc2lnbm8gZGUgbWFsIGNvbXBvcnRhbWllbnRvIG5pIHVuIHByb2JsZW1hIGRlIG1hbGEgY3JpYW56YSwgbmkgc2lnbmlmaWNhbiBxdWUgdHUgaGlqbyBzZWEgJ2RpZsOtY2lsJy4iLCJTZWfDum4gbGEgQWNhZGVtaWEgQW1lcmljYW5hIGRlIFBlZGlhdHLDrWEsIGxhcyBwYXRhbGV0YXMgc29uIHVuYSBmb3JtYSBub3JtYWwgZGUgZXhwcmVzYXIgZW1vY2lvbmVzIGludGVuc2FzLCB1bmEgc2XDsWFsIGRlIHF1ZSBlbCBjZXJlYnJvIGRlbCBuacOxbyBlc3TDoSBlbiBwcm9jZXNvIGRlIG1hZHVyYWNpw7NuIHkgdW5hIHZhbGlvc2Egb3BvcnR1bmlkYWQgcGFyYSBlbnNlw7FhciBhdXRvcnJlZ3VsYWNpw7NuLCBubyBwYXJhIGNhc3RpZ2FyLiIsIkVsIGNlcmVicm8gaW5mYW50aWwg4oCUZXNwZWNpYWxtZW50ZSBsYSBjb3J0ZXphIHByZWZyb250YWwgcXVlIHJlZ3VsYSBlbW9jaW9uZXMgeSBjb250cm9sYSBpbXB1bHNvc+KAlCBubyB0ZXJtaW5hIGRlIGRlc2Fycm9sbGFyc2UgaGFzdGEgbG9zIDIwIG8gMjUgYcOxb3MuIExvIHF1ZSBob3kgdmVzIGNvbW8gdW4gYmVycmluY2hlIGVzIHNpbXBsZW1lbnRlIHVuIGNlcmVicm8gaW5tYWR1cm8gcGlkaWVuZG8gYXl1ZGEuIiwiwr9RdcOpIGNhdXNhIGxhcyBwYXRhbGV0YXM/IExhcyBjYXVzYXMgbcOhcyBjb211bmVzIHNvbjoiLCItIFNvYnJlY2FyZ2EgZW1vY2lvbmFsIG8gY2Fuc2FuY2lvIChkZXNwdcOpcyBkZWwgY29sZWdpbywgZmllc3RhcyBvIHJ1dGluYXMgYWdvdGFkb3JhcykuIiwiLSBIYW1icmUgbyBoaXBvZ2x1Y2VtaWEgKGxvcyBuacOxb3Mgc29uIG11eSBzZW5zaWJsZXMgYSBsYSBmYWx0YSBkZSBlbmVyZ8OtYSkuIiwiLSBGYWx0YSBkZSBoYWJpbGlkYWRlcyBwYXJhIGV4cHJlc2FyIGxvIHF1ZSBzaWVudGVuIChtdWNob3MgbmnDsW9zIHNpZW50ZW4gMTAgZW1vY2lvbmVzIGRpc3RpbnRhcyB5IHNvbG8gc2FiZW4gbm9tYnJhciAnZW5vam8nKS4iLCItIEZydXN0cmFjacOzbiBwb3Igbm8gcG9kZXIgaGFjZXIgYWxnbyAoc3UgZGVzZW8gdmEgbcOhcyByw6FwaWRvIHF1ZSBzdXMgY2FwYWNpZGFkZXMpLiIsIi0gQ29uZXhpw7NuIGJhamEgdGVtcG9yYWwgY29uIGxvcyBwYWRyZXMgKGVsIGRlc2dhc3RlIGRlIGxhIHJ1dGluYSkuIiwiLSBDYW1iaW9zIGluZXNwZXJhZG9zIGRlIGFjdGl2aWRhZC4iLCJEdXJhbnRlIHVuYSBwYXRhbGV0YSwgZWwgY2VyZWJybyBkZWwgbmnDsW8gZW50cmEgZW4gbW9kbyAnYWxhcm1hJy4gTGEgYW3DrWdkYWxhIHRvbWEgZWwgY29udHJvbCB5IGxhIGNvcnRlemEgcHJlZnJvbnRhbCAobGEgbMOzZ2ljYSkgc2UgYXBhZ2EgdGVtcG9yYWxtZW50ZS4gRWwgbmnDsW8gTk8gcHVlZGUgcmF6b25hciwgcmVmbGV4aW9uYXIgbmkgZXNjdWNoYXIgZXhwbGljYWNpb25lcyBlbiBlc2UgbW9tZW50by4gUG9yIGVzbzogZXhwbGljYXJsZXMsIHJlZ2HDsWFybGVzLCBjYXN0aWdhcmxlcyBvIGRlY2lybGVzICdjw6FsbWF0ZScgTk8gZnVuY2lvbmEuIiwiRXhpc3RlbiB0cmVzIHRpcG9zIHByaW5jaXBhbGVzIGRlIHBhdGFsZXRhcyB5IGZvcm1hcyBkZSBtYW5lamFybGFzOiIsIjEuIFBhdGFsZXRhIHBvciBmcnVzdHJhY2nDs24gKGVqLiBubyBsb2dyYXIgYXJtYXIgdW4ganVndWV0ZSkuIFF1w6kgaGFjZXI6IFZhbGlkYSAoJ0VudGllbmRvIHF1ZSB0ZSBmcnVzdHJhJyksIGFjb21wYcOxYSAoJ0VzdG95IGFxdcOtIGNvbnRpZ28nKSB5IGd1w61hICgnSW50ZW50w6ltb3NsbyBqdW50b3MnKS4gTm8gaGFnYXMgdG9kbyBwb3IgZWwgbmnDsW8gbmkgdGUgYnVybGVzLiIsIjIuIFBhdGFsZXRhIHBvciBsw61taXRlcyAoZWouIG5vIHF1ZXJlciBhcGFnYXIgbGEgdGFibGV0KS4gUXXDqSBoYWNlcjogTWFudMOpbiBlbCBsw61taXRlIGZpcm1lbWVudGUgKCdMYSBwYW50YWxsYSB0ZXJtaW7DsyBwb3IgaG95JyksIGVtcGF0aXphICgnU8OpIHF1ZSBxdWVyw61hcyBzZWd1aXIganVnYW5kbycpIHkgb2ZyZWNlIGFsdGVybmF0aXZhcyAoJ0N1YW5kbyB0ZXJtaW5lcyBkZSBlbm9qYXJ0ZSwganVnYW1vcyBhIG90cmEgY29zYScpLiBObyBjZWRhcyBuaSBlbnRyZXMgZW4gbHVjaGFzIGRlIHBvZGVyLiIsIjMuIFBhdGFsZXRhIHBvciBzb2JyZWNhcmdhIGVtb2Npb25hbCAoZWouIGV4cGxvdGFyIGFsIGZpbmFsIGRlbCBkw61hKS4gUXXDqSBoYWNlcjogUmVkdWNlIGVzdMOtbXVsb3MgKGx1eiBiYWphLCBzaWxlbmNpbywgYWJyYXpvKSwgcHJvdGVnZSBsYSBzZWd1cmlkYWQgeSBhY29tcGHDsWEgc2luIGhhYmxhciBkZW1hc2lhZG8uIE5vIGRlcyBzZXJtb25lcyBuaSB1c2VzIGNhc3RpZ29zLiJdLCJoaWdobGlnaHRlZFF1b3RlcyI6WyJDdWFuZG8gZWwgbmnDsW8gZXN0w6EgZGVzYm9yZGFkbywgcHJpbWVybyBkZWJlbW9zIGNvbmVjdGFyLCBkZXNwdcOpcyBjb3JyZWdpci4g4oCUIERhbmllbCBKLiBTaWVnZWwuIiwiQ3VhbmRvIHVuIG5pw7FvIHRpZW5lIHVuYSBwYXRhbGV0YSwgbm8gZXN0w6Egc2llbmRvIGRpZsOtY2lsLiBFc3TDoSB0ZW5pZW5kbyBkaWZpY3VsdGFkZXMuIl0sImtleVRha2Vhd2F5cyI6WyJMYSBlc3RyYXRlZ2lhIGRlIG9ybyBlcyBlbCBtw6l0b2RvIGRlIDUgcGFzb3MgQ0FMTUE6IENvbmVjdGEgcHJpbWVybywgQWNlcHRhIGxhIGVtb2Npw7NuLCBMaW1pdGEgZWwgY29tcG9ydGFtaWVudG8sIE1vZGVsYSByZWd1bGFjacOzbiB5IEFjb21wYcOxYSBoYXN0YSBxdWUgdGVybWluZS4iLCJBbnRpY2lwYSBsb3MgY2FtYmlvcyAoJ0VuIDUgbWludXRvcyBndWFyZGFtb3MgbG9zIGp1Z3VldGVzJykuIiwiQ3JlYSB1biAncmluY8OzbiBkZSBjYWxtYScgKG5vIGVzIHVuIGNhc3RpZ28sIGVzIHVuIGVzcGFjaW8gc2VndXJvIHBhcmEgcmVndWxhcnNlIGNvbiBwZWx1Y2hlcywgbGlicm9zIG8gYm90ZWxsYXMgc2Vuc29yaWFsZXMpLiIsIkNvbmV4acOzbiBkaWFyaWEgZGUgMTAgbWludXRvcyBleGNsdXNpdm9zIHNpbiBwYW50YWxsYXMgcmVkdWNlIHBhdGFsZXRhcyBoYXN0YSB1biA0MCUuIl19LHsiaWQiOiJtb2R1bG8tNCIsInRpdGxlIjoiTcOzZHVsbyA0OiBEdWVybWUgQmllbiBzaW4gRXN0csOpcyIsInN1YnRpdGxlIjoiUnV0aW5hcyBub2N0dXJuYXMgcXVlIGNhbG1hbiwgY29uZWN0YW4geSBhc2VndXJhbiB1biBkZXNjYW5zbyByZXBhcmFkb3IiLCJtb2R1bGVOdW1iZXIiOjQsImNvbnRlbnQiOlsiQ3VhbmRvIHVuIG5pw7FvIG5vIGR1ZXJtZSBiaWVuLCBuYWRpZSBlbiBjYXNhIGR1ZXJtZSBiaWVuLiBMYSBmYWx0YSBkZSBzdWXDsW8gYWZlY3RhIG5lZ2F0aXZhbWVudGUgZWwgY29tcG9ydGFtaWVudG8sIGVsIGVzdGFkbyBkZSDDoW5pbW8sIGxhIGF0ZW5jacOzbiwgbGEgY2FwYWNpZGFkIGRlIHNlZ3VpciBpbnN0cnVjY2lvbmVzIHkgbGEgcmVndWxhY2nDs24gZW1vY2lvbmFsLiIsIlNlZ8O6biBsYSBOYXRpb25hbCBTbGVlcCBGb3VuZGF0aW9uLCBsb3MgbmnDsW9zIHF1ZSBkdWVybWVuIGxvIG5lY2VzYXJpbyB0aWVuZW4gbWVub3MgcGF0YWxldGFzLCBhcHJlbmRlbiBtw6FzIHLDoXBpZG8sIHJpbmRlbiBtZWpvciBlbiBsYSBlc2N1ZWxhLCByZWd1bGFuIG1lam9yIHN1cyBlbW9jaW9uZXMgeSBzb24gbcOhcyBjb29wZXJhdGl2b3MgZHVyYW50ZSBlbCBkw61hLiIsIkVsIGN1ZXJwbyBkZSBsb3MgbmnDsW9zIHByb2R1Y2UgbWVsYXRvbmluYSDigJRsYSBob3Jtb25hIGRlbCBzdWXDsW/igJQgc2lndWllbmRvIHVuIHJpdG1vIG5hdHVyYWwuIFBlcm8gaGF5IGZhY3RvcmVzIG1vZGVybm9zIHF1ZSBwdWVkZW4gYmxvcXVlYXJsYSwgY29tbyBsYXMgcGFudGFsbGFzIChsdXogYXp1bCksIGx1Y2VzIGJsYW5jYXMgbyBpbnRlbnNhcywgc29icmVjYXJnYSBlbW9jaW9uYWwgbyBkZXPDs3JkZW5lcyBlbiBsYSBydXRpbmEuIiwiTGEgZXZpZGVuY2lhIGNpZW50w61maWNhIG11ZXN0cmEgcXVlIHVuYSBydXRpbmEgZXN0cnVjdHVyYWRhIGF1bWVudGEgbGEgcHJvZHVjY2nDs24gZGUgbWVsYXRvbmluYSwgZGlzbWludXllIGVsIGNvcnRpc29sIChsYSBob3Jtb25hIGRlbCBlc3Ryw6lzKSwgcmVkdWNlIGVuIHVuIDUwJSBsb3MgZGVzcGVydGFyZXMgbm9jdHVybm9zIHkgbWVqb3JhIG5vdGFibGVtZW50ZSBsYSBjYWxpZGFkIGRlbCBkZXNjYW5zby4iLCLCv1BvciBxdcOpIGxlcyBjdWVzdGEgZG9ybWlyPyBMYXMgY2F1c2FzIHByaW5jaXBhbGVzIHNvbjoiLCIxLiBTb2JyZWVzdGltdWxhY2nDs24gKHBhbnRhbGxhcywgcnVpZG8gbyBqdWVnb3MgaW50ZW5zb3MganVzdG8gYW50ZXMgZGUgZG9ybWlyIHF1ZSBtYW50aWVuZW4gZWwgY2VyZWJybyBlbmNlbmRpZG8pLiIsIjIuIEZhbHRhIGRlIHNlw7FhbGVzIGNsYXJhcyBkZSBxdWUgZWwgZMOtYSB0ZXJtaW7Dsy4iLCIzLiBOZWNlc2lkYWQgZGUgY29uZXhpw7NuIGVtb2Npb25hbCBhbnRlcyBkZSBsYSBzZXBhcmFjacOzbiBkZSBsYSBub2NoZS4iLCI0LiBBbnNpZWRhZCBwb3Igc2VwYXJhY2nDs24gKGNvbcO6biBlbnRyZSBsb3MgMiB5IDYgYcOxb3MpLiIsIjUuIFJ1dGluYXMgaW5jb25zaXN0ZW50ZXMgcXVlIGNvbmZ1bmRlbiBzdSByZWxvaiBiaW9sw7NnaWNvLiIsIjYuIE1pZWRvcyBvIHBlbnNhbWllbnRvcyBpbnF1aWV0YW50ZXMuIiwiVHUgb2JqZXRpdm8gbm8gZXMgJ2ZvcnphciBhIGRvcm1pcicsIHNpbm8gY3JlYXIgbGFzIGNvbmRpY2lvbmVzIGJpb2zDs2dpY2FzIHkgZW1vY2lvbmFsZXMgcGFyYSBxdWUgZWwgc3Vlw7FvIGxsZWd1ZSBkZSBmb3JtYSBuYXR1cmFsLiJdLCJoaWdobGlnaHRlZFF1b3RlcyI6WyJFbCBzdWXDsW8gaW5mYW50aWwgbm8gc2UgZnVlcnphOyBzZSBhY29tcGHDsWEuIOKAlCBCYXNhZG8gZW4gZXN0dWRpb3MgZGUgbGEgTmF0aW9uYWwgU2xlZXAgRm91bmRhdGlvbi4iXSwia2V5VGFrZWF3YXlzIjpbIlBhc28gMTogVHJhbnNpY2nDs24gc3VhdmUgKDIwLTMwIG1pbiBhbnRlcyk6IGJhamFyIGludGVuc2lkYWQgZGUgbHVjZXMsIGp1ZWdvcyB0cmFucXVpbG9zIHkgaGFibGFyIGVuIHZveiBiYWphLiIsIlBhc28gMjogSGlnaWVuZSB5IGF1dG9jdWlkYWRvOiBsYXZhZG8sIGNlcGlsbGFkbyBkZSBkaWVudGVzLCBjYW1iaW8gZGUgcGlqYW1hLCBvcmRlbiBiw6FzaWNvLiIsIlBhc28gMzogQ29uZXhpw7NuIGVtb2Npb25hbDogY29udmVyc2FjacOzbiBjb3J0YSAoJ8K/UXXDqSBmdWUgbG8gbWVqb3IgZGUgdHUgZMOtYT8nKSBvIHVuIG1hc2FqZSBzdWF2ZS4iLCJQYXNvIDQ6IEFjdGl2aWRhZCBjYWxtYW50ZTogY3VlbnRvLCBtw7pzaWNhIHN1YXZlIG8gdW5hIG1lZGl0YWNpw7NuIGNvcnRhIGd1aWFkYS4iLCJQYXNvIDU6IFJpdHVhbCBkZSBkZXNwZWRpZGEgYW1vcm9zYTogY3JlYXIgdW5hIGZyYXNlIGZpamEgdG9kYXMgbGFzIG5vY2hlcyAoZWouICdCdWVuYXMgbm9jaGVzLCB0ZSBhbW8sIGFxdcOtIGVzdG95IHNpIG1lIG5lY2VzaXRhcycpLiIsIkVycm9yZXMgYSBldml0YXI6IGNyZWVyIHF1ZSBwb3IgZXN0YXIgbXV5IGNhbnNhZG8gc2UgZG9ybWlyw6Egc29sbyAoc2UgYWx0ZXJhbiBtw6FzKSwgcGFudGFsbGFzIGFsIGZpbmFsLCBsdWNoYXIgbyBncml0YXIsIG8gYWNvc3RhcmxvIG11eSB0YXJkZS4iXX0seyJpZCI6Im1vZHVsby01IiwidGl0bGUiOiJNw7NkdWxvIDU6IE1lbm9zIFBhbnRhbGxhcywgTcOhcyBDb25leGnDs24iLCJzdWJ0aXRsZSI6IkZvcnRhbGVjaWVuZG8gZWwgdsOtbmN1bG8gZmFtaWxpYXIgZW4gbGEgZXJhIGRpZ2l0YWwiLCJtb2R1bGVOdW1iZXIiOjUsImNvbnRlbnQiOlsiTGEgdGVjbm9sb2fDrWEgbm8gZXMgZWwgZW5lbWlnby4gRGUgaGVjaG8sIHB1ZWRlIHNlciB1bmEgaGVycmFtaWVudGEgdmFsaW9zYSBjdWFuZG8gc2UgdXNhIGNvbiBpbnRlbmNpw7NuLiBFbCB2ZXJkYWRlcm8gZGVzYWbDrW8gc3VyZ2UgY3VhbmRvIGxhcyBwYW50YWxsYXMgY29taWVuemFuIGEgcmVlbXBsYXphciBhcXVlbGxvIHF1ZSBlcyBpbnN1c3RpdHVpYmxlOiBsYSBwcmVzZW5jaWEgZW1vY2lvbmFsLCBsYSBjb252ZXJzYWNpw7NuIGNhcmEgYSBjYXJhLCBsYSBjcmVhdGl2aWRhZCBlc3BvbnTDoW5lYSB5IGxhIGNvbmV4acOzbiBodW1hbmEuIiwiU2Vnw7puIGxhIEFtZXJpY2FuIEFjYWRlbXkgb2YgUGVkaWF0cmljcywgdW4gdXNvIGV4Y2VzaXZvIG8gbm8gc3VwZXJ2aXNhZG8gZGUgcGFudGFsbGFzIGdlbmVyYSBpcnJpdGFiaWxpZGFkLCBwcm9ibGVtYXMgZGUgY29uY2VudHJhY2nDs24geSBkaWZpY3VsdGFkZXMgcGFyYSBjb25jaWxpYXIgZWwgc3Vlw7FvLiIsIlVuIGVzdHVkaW8gcHVibGljYWRvIGVuIEpBTUEgUGVkaWF0cmljcyBlbmNvbnRyw7MgcXVlIGxvcyBuacOxb3MgY29uIG3DoXMgZGUgMiBob3JhcyBkaWFyaWFzIGRlIHBhbnRhbGxhcyBwcmVzZW50YWJhbiB1biBtZW5vciBkZXNhcnJvbGxvIGRlIGhhYmlsaWRhZGVzIGxpbmfDvMOtc3RpY2FzIHkgZGUgYXV0b2NvbnRyb2wuIiwiTGEgcHNpY8OzbG9nYSBDYXRoZXJpbmUgU3RlaW5lci1BZGFpciBhZmlybWEgcXVlICdlbCBwcm9ibGVtYSBubyBzb24gbG9zIGRpc3Bvc2l0aXZvcywgc2lubyBsYSBww6lyZGlkYSBkZSBwcmVzZW5jaWEgeSBkZSBpbnRlcmFjY2nDs24gc2lnbmlmaWNhdGl2YSBlbiBsYSB2aWRhIGZhbWlsaWFyJy4gTm8gc2UgdHJhdGEgZGUgZWxpbWluYXIgbGEgdGVjbm9sb2fDrWEgcG9yIGNvbXBsZXRvLCBzaW5vIGRlIGNvbnN0cnVpciBhbHRlcm5hdGl2YXMgZmFtaWxpYXJlcyB5IGRlIGNvbmV4acOzbiBxdWUgc2VhbiBtw6FzIGZ1ZXJ0ZXMuIiwiUGFyYSBsb2dyYXJsbyBkZSBtYW5lcmEgcmVzcGV0dW9zYSB5IHNpbiBwZWxlYXMsIGFwbGljYSB0cmVzIHByaW5jaXBpb3MgZnVuZGFtZW50YWxlczoiLCIxLiBMb3MgbMOtbWl0ZXMgc2UgZXhwbGljYW4sIG5vIHNlIGltcG9uZW46IExvcyBuacOxb3MgY3VtcGxlbiBtdWNobyBtZWpvciBjdWFuZG8gY29tcHJlbmRlbiBlbCAncG9yIHF1w6knIGVuIGx1Z2FyIGRlIHJlY2liaXIgdW4gZ3JpdG8gY29tbyAnwqFZYSBkZWphIGVzYSB0YWJsZXQhJy4iLCIyLiBUw7ogbW9kZWxhcyBsbyBxdWUgcXVpZXJlcyB2ZXI6IExvcyBoaWpvcyBubyBpbWl0YW4gbG8gcXVlIGRlY2ltb3MsIHNpbm8gbG8gcXVlIGhhY2Vtb3MuIFByZWfDum50YXRlIHNpIG1pcmFzIGVsIG3Ds3ZpbCBtaWVudHJhcyB0ZSBoYWJsYW4gbyBzaSB1c2FzIHBhbnRhbGxhcyBlbiBtb21lbnRvcyBkZSBjb25leGnDs24uIiwiMy4gRWwgbMOtbWl0ZSBzZSBhY29tcGHDsWEgY29uIGFsdGVybmF0aXZhcyByZWFsZXM6IE5vIGJhc3RhIGNvbiBxdWl0YXIsIGhheSBxdWUgb2ZyZWNlciBhbHRlcm5hdGl2YXMgaW50ZXJlc2FudGVzIHkgZ3VpYXJsb3MgZW4gbGEgdHJhbnNpY2nDs24uIiwiRWwgUGxhbiBGYW1pbGlhciBkZSBVc28gU2FsdWRhYmxlIGRlIFBhbnRhbGxhcyAoUEFTVVBBKSBwcm9wb25lIGN1YXRybyBwYXNvczoiLCItIFBhc28gMTogRGVmaW5pciBqdW50b3MgbW9tZW50b3MgbGlicmVzIGRlIHBhbnRhbGxhcyAoY29taWRhcywgYW50ZXMgZGUgZG9ybWlyLCBwYXNlb3MpLiIsIi0gUGFzbyAyOiBFc3RhYmxlY2VyIGhvcmFyaW9zIGNsYXJvcyAobcOheCAyaCBkZSBlbnRyZXRlbmltaWVudG8gYWwgZMOtYSB5IGFwYWdhciAxIGhvcmEgYW50ZXMgZGUgZG9ybWlyKS4iLCItIFBhc28gMzogQ3JlYXIgdW4gJ01lbsO6IGRlIGFsdGVybmF0aXZhcyBhdHJhY3RpdmFzJyBlc3BlY8OtZmljYXMgcGFyYSBjYWRhIGVkYWQuIiwiLSBQYXNvIDQ6IFVzYXIgbGEgdGVjbm9sb2fDrWEgY29tbyBhbGlhZGEgcGFyYSBjcmVhciBkZSBmb3JtYSBjb21wYXJ0aWRhIChlai4gdmVyIGRvY3VtZW50YWxlcywgY29jaW5hciBjb24gdW5hIHJlY2V0YSBlbiB2aWRlbykuIl0sImhpZ2hsaWdodGVkUXVvdGVzIjpbIkN1YW50YXMgbcOhcyBhbHRlcm5hdGl2YXMgeSBvcGNpb25lcyBkZSBjb25leGnDs24gZXhpc3RhbiBlbiBjYXNhLCBtZW5vcyBkaXNjdXNpb25lcyB5IGJlcnJpbmNoZXMgaGFicsOhLiJdLCJrZXlUYWtlYXdheXMiOlsiRXN0cmF0ZWdpYSBkZSBhbnRpY2lwYWNpw7NuOiBBdmlzYSBjb24gdGllbXBvICgnVGUgcXVlZGFuIDEwIG1pbnV0b3MgZGUganVlZ28gcGFyYSBndWFyZGFyJykuIiwiVmFsaWRhY2nDs24gZW1vY2lvbmFsOiBWYWxpZGEgc3UgZnJ1c3RyYWNpw7NuICgnU8OpIHF1ZSBxdWVyw61hcyBzZWd1aXIganVnYW5kbywgZXMgZGlmw61jaWwgcGFyYXInKS4iLCJDb25leGnDs24gKyBSZWRpcmVjY2nDs246IE9mcmVjZSB1biByZXRvIG8gYWx0ZXJuYXRpdmEgKCdIYWdhbW9zIGp1bnRvcyBlc3RlIGp1ZWdvJykuIiwiUnV0aW5hcyB2aXN1YWxlczogVW4gY3VhZHJvIHZpc2libGUgZGUgYWN0aXZpZGFkZXMgcmVkdWNlIHVuIDgwJSBkZSBsb3MgY29uZmxpY3Rvcy4iXX1d")))),
+                plan21Days: JSON.parse(decodeURIComponent(escape(atob("W3siZGF5IjoxLCJ3ZWVrIjoxLCJ0aXRsZSI6IlJpdHVhbCBkZSBjb25leGnDs24gZGUgMTAgbWludXRvcyIsIm9iamVjdGl2ZSI6IkVzdGFibGVjZXIgbGEgYmFzZSBlbW9jaW9uYWwgZGUgbGEgY3JpYW56YSBhIHRyYXbDqXMgZGUgbGEgcHJlc2VuY2lhIHB1cmEuIiwiYWN0aW9uIjoiRGVkaWNhIDEwIG1pbnV0b3MgZXhjbHVzaXZvcywgdW5vIGEgdW5vIGNvbiBjYWRhIGhpam8sIHRvdGFsbWVudGUgbGlicmUgZGUgcGFudGFsbGFzLCB0ZWzDqWZvbm9zIGUgaW50ZXJydXBjaW9uZXMuIERlamEgcXVlIHR1IGhpam8gZWxpamEgbGEgYWN0aXZpZGFkLiIsImV4YW1wbGVzIjpbIkxlZXIgdW4gY3VlbnRvIGp1bnRvcyIsIkRpYnVqYXIgbyBwaW50YXIgZW4gdW5hIGhvamEgY29tcGFydGlkYSIsIkNvbnZlcnNhciBzb2JyZSBzdXMgdGVtYXMgZmF2b3JpdG9zIHNpbiBjdWVzdGlvbmFyIiwiQXJtYXIgbGVnb3MgbyBibG9xdWVzIGRlIGNvbnN0cnVjY2nDs24iXSwicXVvdGUiOiJMYSBjb25leGnDs24gZXMgbGEgbW9uZWRhIGVtb2Npb25hbCBjb24gbGEgcXVlIHNlIGNvbXByYW4gbG9zIGJ1ZW5vcyBjb21wb3J0YW1pZW50b3MuIOKAlCBEci4gTGF3cmVuY2UgQ29oZW4uIiwiY2F0ZWdvcnkiOiJjb25uZWN0aW9uIn0seyJkYXkiOjIsIndlZWsiOjEsInRpdGxlIjoiQ3JlYXIgbGEgcmVnbGEgZGUgb3JvIGZhbWlsaWFyIiwib2JqZWN0aXZlIjoiRGVmaW5pciB1biBtYXJjbyBkZSByZXNwZXRvIG11dHVvIHBhcmEgdG9kYXMgbGFzIGludGVyYWNjaW9uZXMgZGVsIGhvZ2FyLiIsImFjdGlvbiI6IlJlw7puZXRlIGNvbiB0dSBmYW1pbGlhIGJyZXZlbWVudGUgeSBkZWZpbmFuIHVuYSBzb2xhIHJlZ2xhIGNlbnRyYWwgcG9zaXRpdmEgcXVlIGd1w61lIHN1IGNvbnZpdmVuY2lhLiBFc2Nyw61iYW5sYSBlbiB1biBjYXJ0ZWwgeSBjb2zDs3F1ZW5sbyBlbiB1biBsdWdhciB2aXNpYmxlIGNvbW8gZWwgcmVmcmlnZXJhZG9yLiIsImV4YW1wbGVzIjpbIk5vcyBoYWJsYW1vcyBjb24gcmVzcGV0byB5IHRvbm8gc3VhdmUuIiwiTm9zIHRyYXRhbW9zIGNvbiBjYXJpw7FvIHkgbm9zIGF5dWRhbW9zLiIsIkJ1c2NhbW9zIHNvbHVjaW9uZXMgZW4gZXF1aXBvIGVuIGx1Z2FyIGRlIGJ1c2NhciBjdWxwYWJsZXMuIl0sInF1b3RlIjoiRXN0YWJsZWNlciBwYXV0YXMgY2xhcmFzIGRlIGNvbnZpdmVuY2lhIHByZXZpZW5lIGRpc2N1c2lvbmVzIHkgZGEgZXN0cnVjdHVyYSBlbW9jaW9uYWwuIiwiY2F0ZWdvcnkiOiJjb2V4aXN0In0seyJkYXkiOjMsIndlZWsiOjEsInRpdGxlIjoiRXN0YWJsZWNlciB1bmEgcnV0aW5hIHZpc3VhbCBkZSBtYcOxYW5hIHkgbm9jaGUiLCJvYmplY3RpdmUiOiJSZWR1Y2lyIGxhIGZyaWNjacOzbiBkaWFyaWEgb3JnYW5pemFuZG8gbGFzIHRyYW5zaWNpb25lcyBkZSBmb3JtYSBjb21wcmVuc2libGUuIiwiYWN0aW9uIjoiRGlzZcOxYSB1biBjYXJ0ZWwgc2VuY2lsbG8gY29uIDQgbyA1IHBhc29zIGNsYXJvcyBxdWUgdHUgaGlqbyBkZWJhIHNlZ3VpciBhbCBsZXZhbnRhcnNlIHkgYWwgYWNvc3RhcnNlLiBVc2EgZGlidWpvcyBvIGljb25vcyBzZW5jaWxsb3MuIiwiZXhhbXBsZXMiOlsiTWHDsWFuYTogTGV2YW50YXJzZSDinpQgQ2VwaWxsYXJzZSDinpQgVmVzdGlyc2Ug4p6UIERlc2F5dW5hciDinpQgTW9jaGlsYSIsIk5vY2hlOiBCYcOxYXJzZSDinpQgUGlqYW1hIOKelCBDZW5hciDinpQgQ3VlbnRvL0FicmF6byDinpQgRG9ybWlyIl0sInF1b3RlIjoiTGFzIHJ1dGluYXMgdmlzdWFsZXMgcmVkdWNlbiBoYXN0YSB1biA4MCUgZGUgbGFzIGRpc2N1c2lvbmVzIHJlcGV0aXRpdmFzLCBzZWfDum4gZWwgQ2hpbGQgRGV2ZWxvcG1lbnQgSW5zdGl0dXRlLiIsImNhdGVnb3J5Ijoicm91dGluZXMifSx7ImRheSI6NCwid2VlayI6MSwidGl0bGUiOiJMYSB0w6ljbmljYSBkZSBsYSBhbnRpY2lwYWNpw7NuIiwib2JqZWN0aXZlIjoiRXZpdGFyIGVsIGNob3F1ZSBkZSBsYXMgdHJhbnNpY2lvbmVzIHByZXBhcmFuZG8gZWwgY2VyZWJybyBkZWwgbmnDsW8uIiwiYWN0aW9uIjoiSWRlbnRpZmljYSAzIG1vbWVudG9zIGRlbCBkw61hIGRvbmRlIHN1ZWxhIGhhYmVyIGNvbmZsaWN0byAoZWouIGFwYWdhciBwYW50YWxsYXMsIGlyIGEgYmHDsWFyc2UsIHNhbGlyIGRlIGNhc2EpIHkgcHJhY3RpY2EgYXZpc2FyIGNvbiB0aWVtcG8gYW50ZXMgZGUgcXVlIG9jdXJyYSBsYSB0cmFuc2ljacOzbi4iLCJleGFtcGxlcyI6WyJFbiA1IG1pbnV0b3MgdmFtb3MgYSBndWFyZGFyIGxvcyBqdWd1ZXRlcyBwYXJhIGlyIGEgY2VuYXIsIGVsaWdlIGxvIMO6bHRpbW8gcXVlIGhhcsOhcy4iLCJUZSBxdWVkYW4gMTAgbWludXRvcyBkZSB0YWJsZXQgcGFyYSBxdWUgcHVlZGFzIGNlcnJhcmxhIHNpbiBwcmlzYS4iXSwicXVvdGUiOiJMYSBhbnRpY2lwYWNpw7NuIHJlZHVjZSBsYSByZWFjdGl2aWRhZCBwb3JxdWUgcGVybWl0ZSBhbCBjZXJlYnJvIGluZmFudGlsIHByZXBhcmFyc2UgcGFyYSBlbCBjYW1iaW8uIiwiY2F0ZWdvcnkiOiJyb3V0aW5lcyJ9LHsiZGF5Ijo1LCJ3ZWVrIjoxLCJ0aXRsZSI6IkVzcGFjaW8gZGUgY2FsbWEgZW4gY2FzYSIsIm9iamVjdGl2ZSI6Ik9mcmVjZXIgdW5hIGFsdGVybmF0aXZhIGRlIGF1dG9ycmVndWxhY2nDs24gZW4gbHVnYXIgZGVsIGNhc3RpZ28uIiwiYWN0aW9uIjoiQ3JlYSBqdW50byBjb24gdHVzIGhpam9zIHVuIHBlcXVlw7FvIHJpbmPDs24gYWNvZ2Vkb3IgZGUgY2FsbWEgZW4gZWwgaG9nYXIuIEVxdcOtcGFsbyBjb24gZWxlbWVudG9zIHN1YXZlcyB5IHRyYW5xdWlsb3MuIEV4cGxpY2EgcXVlIG5vIGVzIHBhcmEgY2FzdGlnYXIsIHNpbm8gcGFyYSBzZW50aXJzZSBtZWpvci4iLCJleGFtcGxlcyI6WyJDb2xvY2FyIGNvamluZXMgY8OzbW9kb3MgeSB1bmEgbWFudGEgc3VhdmUiLCJUZW5lciB1bmEgJ2JvdGVsbGEgZGUgbGEgY2FsbWEnIGNvbiBwdXJwdXJpbmEiLCJEaXNwb25lciBkZSBob2phcyBwYXJhIGNvbG9yZWFyLCBwZWx1Y2hlcyBvIGxpYnJvcyBzZW5zb3JpYWxlcyJdLCJxdW90ZSI6Ik1vZGVsYXIgc3UgdXNvOiAnTWUgc2llbnRvIHVuIHBvY28gZXN0cmVzYWRvLCBpcsOpIDIgbWludXRvcyBhIG1pIGVzcGFjaW8gZGUgY2FsbWEgYSByZXNwaXJhcicuIiwiY2F0ZWdvcnkiOiJlbW90aW9ucyJ9LHsiZGF5Ijo2LCJ3ZWVrIjoxLCJ0aXRsZSI6IkFjdWVyZG8gZmFtaWxpYXIgZGUgcGFudGFsbGFzIiwib2JqZWN0aXZlIjoiRXN0YWJsZWNlciBsw61taXRlcyBkaWdpdGFsZXMgY2xhcm9zIHkgY29uc2Vuc3VhZG9zLiIsImFjdGlvbiI6IkNvbnZlcnNlbiB5IGRlZmluYW4gcmVnbGFzIGVzdGFibGVzIHBhcmEgZWwgdXNvIGRlIGRpc3Bvc2l0aXZvczogaG9yYXJpb3MgZGUgdXNvLCB6b25hcyBsaWJyZXMgZGUgcGFudGFsbGFzIChjb21lZG9yKSB5IHF1w6kgcGFzYSBzaSBubyBzZSByZXNwZXRhIGVsIHRpZW1wby4iLCJleGFtcGxlcyI6WyJQYW50YWxsYXMgYXBhZ2FkYXMgZHVyYW50ZSB0b2RhcyBsYXMgY29taWRhcy4iLCJObyB1c2FyIGRpc3Bvc2l0aXZvcyAxIGhvcmEgYW50ZXMgZGUgZG9ybWlyLiIsIkNvbnNlY3VlbmNpYSBuYXR1cmFsOiBzaSBubyBzZSBhcGFnYSBhIHRpZW1wbyB2b2x1bnRhcmlhbWVudGUsIHNlIGRlc2N1ZW50YSBlc2UgdGllbXBvIGRlbCBkw61hIHNpZ3VpZW50ZS4iXSwicXVvdGUiOiJMb3MgbMOtbWl0ZXMgZXhwbGljYWRvcyB5IGNvbnNlbnN1YWRvcyBnZW5lcmFuIG11Y2hvIG1lbm9yIHJlY2hhem8gcXVlIGxhcyBwcm9oaWJpY2lvbmVzIGltcHVlc3RhcyBjb24gZ3JpdG9zLiIsImNhdGVnb3J5IjoiY29leGlzdCJ9LHsiZGF5Ijo3LCJ3ZWVrIjoxLCJ0aXRsZSI6IkNlbGVicmFjacOzbiB5IHJldmlzacOzbiBkZSBsYSBTZW1hbmEgMSIsIm9iamVjdGl2ZSI6IlJlZm9yemFyIGVsIGF1dG9lc3RpbWEgZmFtaWxpYXIgeSBldmFsdWFyIGxvcyBwcmltZXJvcyBhanVzdGVzLiIsImFjdGlvbiI6IkRlZGljYSB1biBtb21lbnRvIGVuIGxhIGNvbWlkYSBvIGNlbmEgcGFyYSBjb252ZXJzYXIgc29icmUgbG8gcXVlIGhhIGNhbWJpYWRvIGVuIGVzdGEgcHJpbWVyYSBzZW1hbmEuIFJlY29ub2NlIGVsIGVzZnVlcnpvIGRlIHRvZG9zIHkgY2VsZWJyZW4gY29uIHVuYSBjb21pZGEgbyBqdWVnbyBlc3BlY2lhbC4iLCJleGFtcGxlcyI6WyLCv1F1w6kgcnV0aW5hIHZpc3VhbCBub3MgYXl1ZMOzIG3DoXM/Iiwiwr9RdcOpIGZ1ZSBsbyBtw6FzIGRpZsOtY2lsIGRlIGFudGljaXBhcj8iLCJSZWNvbm9jZXI6ICdNZSBlbmNhbnTDsyB2ZXIgY8OzbW8gb3JnYW5pemFyb24gc3VzIHphcGF0b3MgaG95Jy4iXSwicXVvdGUiOiJSZWZvcnphciBsYSBhdXRvZXN0aW1hIGZhbWlsaWFyIHkgbGEgY29tdW5pY2FjacOzbiBlc3RyZWNoYSBsb3MgbGF6b3MgZGUgY29uZmlhbnphLiIsImNhdGVnb3J5IjoiY29ubmVjdGlvbiJ9LHsiZGF5Ijo4LCJ3ZWVrIjoyLCJ0aXRsZSI6IlRhcmVhcyBwb3IgZWRhZCAoTWljcm9yZXNwb25zYWJpbGlkYWRlcykiLCJvYmplY3RpdmUiOiJGb21lbnRhciBsYSBhdXRvbm9tw61hIGFzaWduYW5kbyByb2xlcyDDunRpbGVzIHNlZ8O6biBlbCBkZXNhcnJvbGxvLiIsImFjdGlvbiI6IkFzaWduYSB1bmEgcGVxdWXDsWEgcmVzcG9uc2FiaWxpZGFkIGRpYXJpYSBhIHR1IGhpam8gcXVlIHNlYSBhY29yZGUgYSBzdSBlZGFkLiBIYXpsbyB2ZXIgY29tbyB1bmEgY29udHJpYnVjacOzbiB2YWxpb3NhIHBhcmEgZWwgZXF1aXBvIGZhbWlsaWFyLiIsImV4YW1wbGVzIjpbIjMgYSA1IGHDsW9zOiBHdWFyZGFyIHN1cyBqdWd1ZXRlcyBlbiBsYSBjYWphLCBwb25lciBzZXJ2aWxsZXRhcyBlbiBsYSBtZXNhLiIsIjYgYSA4IGHDsW9zOiBQcmVwYXJhciBzdSBtb2NoaWxhLCBkb2JsYXIgc3UgcGlqYW1hLiIsIjkgYSAxMiBhw7FvczogVGVuZGVyIHN1IGNhbWEgc29sbywgYWxpbWVudGFyIGEgbGEgbWFzY290YS4iLCIxMysgYcOxb3M6IEF5dWRhciBhIHByZXBhcmFyIHVuYSBjZW5hIHNlbmNpbGxhLCBvcmdhbml6YXIgbGFzIGNvbXByYXMuIl0sInF1b3RlIjoiTGFzIHJlc3BvbnNhYmlsaWRhZGVzIG5vIGRlYmVuIHZlcnNlIGNvbW8gY2FzdGlnbywgc2lubyBjb21vIHBhcnRpY2lwYWNpw7NuIGFjdGl2YSB5IG9yZ3VsbG8gZmFtaWxpYXIuIiwiY2F0ZWdvcnkiOiJyZXNwb25zaWJpbGl0eSJ9LHsiZGF5Ijo5LCJ3ZWVrIjoyLCJ0aXRsZSI6IlTDqWNuaWNhICdKdW50b3MgeSBsdWVnbyB0w7onIiwib2JqZWN0aXZlIjoiRGVzYXJyb2xsYXIgbGEgaW5kZXBlbmRlbmNpYSBkZSBmb3JtYSBwcm9ncmVzaXZhIHkgc2luIGZydXN0cmFjacOzbi4iLCJhY3Rpb24iOiJDdWFuZG8gdHUgaGlqbyBkZWJhIHJlYWxpemFyIHVuYSB0YXJlYSBudWV2YSBvIGRpZsOtY2lsLCBhcGxpcXVlbiBlbCBhY29tcGHDsWFtaWVudG8gcHJvZ3Jlc2l2bzogcHJpbWVybyBsbyBoYWNlbiBqdW50b3MsIGx1ZWdvIHTDuiBzdXBlcnZpc2FzIGFwb3lhbmRvLCB5IGZpbmFsbWVudGUgbG8gaGFjZSBzb2xvLiIsImV4YW1wbGVzIjpbIk9yZGVuYXIgZWwgY3VhcnRvOiAnWW8gZ3VhcmRvIGxvcyBibG9xdWVzLCB0w7ogZ3VhcmRhcyBsb3MgcGVsdWNoZXMsIMKhaGFnw6Ftb3NsbyBqdW50b3MhJyIsIlZlc3RpcnNlOiAnWW8gdGUgcG9uZ28gZWwgcGFudGFsw7NuLCB0w7ogdGUgc3ViZXMgbGEgcGxheWVyYScuIl0sInF1b3RlIjoiRWwgYWNvbXBhw7FhbWllbnRvIHByb2dyZXNpdm8gcmVkdWNlIGxhIGZydXN0cmFjacOzbiB5IGZvbWVudGEgdW5hIHZlcmRhZGVyYSBhdXRvbm9tw61hLiIsImNhdGVnb3J5IjoicmVzcG9uc2liaWxpdHkifSx7ImRheSI6MTAsIndlZWsiOjIsInRpdGxlIjoiRGVsZWdhciBjb24gY2xhcmlkYWQgZW4gMyBwYXNvcyIsIm9iamVjdGl2ZSI6IkVsaW1pbmFyIG1hbGVudGVuZGlkb3Mgb2ZyZWNpZW5kbyBpbnN0cnVjY2lvbmVzIHByZWNpc2FzLiIsImFjdGlvbiI6IkFzZWfDunJhdGUgZGUgZGVsZWdhciBjdWFscXVpZXIgdGFyZWEgYXBsaWNhbmRvIHRyZXMgcGFzb3M6IHF1w6kgZGViZSBoYWNlciwgY8OzbW8gZGViZSBoYWNlcmxvLCB5IGPDs21vIHNhYnLDoSBxdWUgZXN0w6EgYmllbiBoZWNoby4gRXZpdGEgw7NyZGVuZXMgYW1iaWd1YXMuIiwiZXhhbXBsZXMiOlsiRW4gbHVnYXIgZGUgJ0xpbXBpYSB0dSBjdWFydG8nLCBkaTogJzEuIEd1YXJkYSBsb3MganVndWV0ZXMgZW4gc3UgY2FqYS4gMi4gUG9uIGxhIHJvcGEgc3VjaWEgZW4gZWwgY2VzdG8uIEVzdGFyw6EgbGlzdG8gY3VhbmRvIGVsIHN1ZWxvIHNlIHZlYSBjb21wbGV0YW1lbnRlIGRlc3BlamFkbycuIl0sInF1b3RlIjoiRGFyIGNsYXJpZGFkIGFic29sdXRhIHJlZHVjZSBsYSByZXNpc3RlbmNpYSB5IGxhIGZydXN0cmFjacOzbiBlbiB1biA5MCUuIiwiY2F0ZWdvcnkiOiJyZXNwb25zaWJpbGl0eSJ9LHsiZGF5IjoxMSwid2VlayI6MiwidGl0bGUiOiJSZWVtcGxhemFyIMOzcmRlbmVzIHBvciBlbGVjY2lvbmVzIGd1aWFkYXMiLCJvYmplY3RpdmUiOiJEYXIgc2Vuc2FjacOzbiBkZSBjb250cm9sIGFsIG5pw7FvIHBhcmEgZGlzbWludWlyIGxhIG9wb3NpY2nDs24uIiwiYWN0aW9uIjoiSG95LCBlbiBsdWdhciBkZSBkYXIgbWFuZGF0b3MgZGlyZWN0b3MgKGVqLiAnwqFQb250ZSBsb3MgemFwYXRvcyB5YSEnKSwgb2ZyZWNlIGRvcyBhbHRlcm5hdGl2YXMgdsOhbGlkYXMgcGFyYSB0aSBkb25kZSDDqWwgZGVjaWRhLiIsImV4YW1wbGVzIjpbIsK/UHJlZmllcmVzIHBvbmVydGUgbG9zIHRlbmlzIGF6dWxlcyBvIGxvcyB6YXBhdG9zIG5lZ3JvcyBwYXJhIHNhbGlyPyIsIsK/UXVpZXJlcyBlbXBlemFyIGEgb3JkZW5hciBwb3IgbG9zIGxpYnJvcyBvIHBvciBsb3MgZGlub3NhdXJpb3MgZGUgcGzDoXN0aWNvPyJdLCJxdW90ZSI6IkRhciBvcGNpb25lcyBjb250cm9sYWRhcyBhdW1lbnRhIGxhIHRhc2EgZGUgY29vcGVyYWNpw7NuIHZvbHVudGFyaWEgZW4gbcOhcyBkZSB1biA2MCUuIiwiY2F0ZWdvcnkiOiJjb2V4aXN0In0seyJkYXkiOjEyLCJ3ZWVrIjoyLCJ0aXRsZSI6IlJldW5pw7NuIGZhbWlsaWFyIGRlIDEwIG1pbnV0b3MiLCJvYmplY3RpdmUiOiJGb21lbnRhciBlbCB0cmFiYWpvIGVuIGVxdWlwbyB5IGxhIHRvbWEgZGUgZGVjaXNpb25lcyBjb25qdW50YXMuIiwiYWN0aW9uIjoiSGFnYW4gdW5hIG1pY3JvLXJldW5pw7NuIGRvbmRlIHRvZG9zIGxvcyBtaWVtYnJvcyBwYXJ0aWNpcGVuIHkgZWxpamFuIHVuYSBtZXRhIGRlIGNvbGFib3JhY2nDs24gc2ltcGxlIHBhcmEgbGEgY2FzYSBkdXJhbnRlIGVzdGEgc2VtYW5hLiIsImV4YW1wbGVzIjpbIk1ldGE6IE1hbnRlbmVyIGVsIGNvbWVkb3IgbGlicmUgZGUganVndWV0ZXMgYWwgZmluYWwgZGVsIGTDrWEuIiwiTWV0YTogUXVlIGNhZGEgcXVpZW4gbGxldmUgc3UgcGxhdG8gYSBsYSBjb2NpbmEgZGVzcHXDqXMgZGUgY2VuYXIuIl0sInF1b3RlIjoiTG9zIG5pw7FvcyBzZSBjb21wcm9tZXRlbiBtw6FzIGNvbiBsYXMgc29sdWNpb25lcyBjdWFuZG8gc2Ugc2llbnRlbiBlc2N1Y2hhZG9zIGVuIGVsIHByb2Nlc28uIiwiY2F0ZWdvcnkiOiJjb2V4aXN0In0seyJkYXkiOjEzLCJ3ZWVrIjoyLCJ0aXRsZSI6IlNpc3RlbWEgZGUgcmVmb3J6YWRvcmVzIHBvc2l0aXZvcyIsIm9iamVjdGl2ZSI6IkZvY2FsaXphciBsYSBhdGVuY2nDs24gZW4gZWwgYnVlbiBjb21wb3J0YW1pZW50byBlbiBsdWdhciBkZSBlbiBlbCBlcnJvci4iLCJhY3Rpb24iOiJIb3kgY29uY8OpbnRyYXRlIGVuIGVsb2dpYXIgeSBjZWxlYnJhciB2ZXJiYWxtZW50ZSBkZSBtYW5lcmEgbXV5IGVzcGVjw61maWNhIGNhZGEgdmV6IHF1ZSB0dSBoaWpvIGNvbGFib3JlIG8gbXVlc3RyZSB1biBjb21wb3J0YW1pZW50byBwb3NpdGl2by4iLCJleGFtcGxlcyI6WyJFbG9naW8gZXNwZWPDrWZpY286ICdWaSBsbyBvcmRlbmFkbyBxdWUgZGVqYXN0ZSB0dSBlc2NyaXRvcmlvLCBzZSBzaWVudGUgZ2VuaWFsIHRyYWJhamFyIGFow60sIGdyYWNpYXMgcG9yIHR1IGVzZnVlcnpvJy4iLCJSZWNvbXBlbnNhIGRlIGNvbmV4acOzbjogJ0NvbW8gY29sYWJvcmFtb3MgcsOhcGlkbywgZ2FuYW1vcyAxNSBtaW51dG9zIGV4dHJhcyBwYXJhIGp1Z2FyIGp1bnRvcycuIl0sInF1b3RlIjoiUmVmb3J6YXIgcG9zaXRpdmFtZW50ZSBsYXMgY29uZHVjdGFzIGFkZWN1YWRhcyBlcyAxMCB2ZWNlcyBtw6FzIGVmZWN0aXZvIHBhcmEgZmlqYXIgaMOhYml0b3MgcXVlIGNhc3RpZ2FyIGxvcyBlcnJvcmVzLiIsImNhdGVnb3J5IjoicmVzcG9uc2liaWxpdHkifSx7ImRheSI6MTQsIndlZWsiOjIsInRpdGxlIjoiQWN0aXZpZGFkIGZhbWlsaWFyIGRlIHJlc3BvbnNhYmlsaWRhZCIsIm9iamVjdGl2ZSI6IkFwcmVuZGVyIGVsIHZhbG9yIGRlbCBlc2Z1ZXJ6byBjb21wYXJ0aWRvIGNvbXBhcnRpZW5kbyB0YXJlYXMuIiwiYWN0aW9uIjoiRWxpamFuIHVuYSBhY3RpdmlkYWQgZGUgbGltcGllemEgbyBtYW50ZW5pbWllbnRvIGRlbCBob2dhciB5IHJlYWzDrWNlbmxhIGp1bnRvcyBjb21vIHVuIHJldG8gZGl2ZXJ0aWRvLCBjb24gbcO6c2ljYSBkZSBmb25kbyBvIGp1ZWdvIGRlIHJvbGVzLiIsImV4YW1wbGVzIjpbIkNvY2luYXIganVudG9zIHVuYSBwaXp6YSBvIHBvc3RyZSBzZW5jaWxsbywgZGl2aWRpZW5kbyBsYXMgdGFyZWFzLiIsIkxhdmFyIGVsIGF1dG9tw7N2aWwgZmFtaWxpYXIgY29uIGVzcG9uamFzIHkgZXNwdW1hLiIsIlJlZ2FyIHkgbGltcGlhciBsYXMgbWFjZXRhcyBkZSBsYXMgcGxhbnRhcyBkZWwgYmFsY8OzbiBvIGphcmTDrW4uIl0sInF1b3RlIjoiSGFjZXIgdGFyZWFzIGp1bnRvcyByZWZ1ZXJ6YSBsYSBpZGVhIGRlIHF1ZSBsYSBmYW1pbGlhIGVzIHVuIGVxdWlwbyBkb25kZSB0b2RvcyBhcG9ydGFuLiIsImNhdGVnb3J5IjoiY29ubmVjdGlvbiJ9LHsiZGF5IjoxNSwid2VlayI6MywidGl0bGUiOiJFbnNlw7FhciBwYWxhYnJhcyBlbW9jaW9uYWxlcyIsIm9iamVjdGl2ZSI6IkRlc2Fycm9sbGFyIGVsIHZvY2FidWxhcmlvIGVtb2Npb25hbCBwYXJhIHByZXZlbmlyIGRlc2JvcmRlcy4iLCJhY3Rpb24iOiJEZWRpY2EgdW4gdGllbXBvIGEganVnYXIgY29uIHR1cyBoaWpvcyBpZGVudGlmaWNhbmRvIGxhcyA1IGVtb2Npb25lcyBiw6FzaWNhczogYWxlZ3LDrWEsIHRyaXN0ZXphLCBlbm9qbywgbWllZG8geSBmcnVzdHJhY2nDs24uIERpYnVqZW4gY2FyYXMgbyBoYWdhbiBnZXN0b3MgZnJlbnRlIGFsIGVzcGVqby4iLCJleGFtcGxlcyI6WyJKdWdhciBhOiAnTXXDqXN0cmFtZSBjb24gdHUgY2FyYSBjw7NtbyBzZSB2ZSBlc3RhciBmcnVzdHJhZG8geSBjw7NtbyByZXNwaXJhIHVuIGN1ZXJwbyBlbm9qYWRvJy4iLCJWYWxpZGFyOiAnUGFyZWNlIHF1ZSBlc3TDoXMgZnJ1c3RyYWRvIHBvcnF1ZSBlbCBibG9xdWUgbm8gZW5jYWphLCDCv2VzIGFzw60/JyJdLCJxdW90ZSI6IkxvcyBuacOxb3MgcXVlIHB1ZWRlbiBub21icmFyIGxvIHF1ZSBzaWVudGVuIG11ZXN0cmFuIHVuYSByZWR1Y2Npw7NuIGRyw6FzdGljYSBkZSBwYXRhbGV0YXMgeSByYWJpZXRhcy4iLCJjYXRlZ29yeSI6ImVtb3Rpb25zIn0seyJkYXkiOjE2LCJ3ZWVrIjozLCJ0aXRsZSI6IkxhIHJlZ2xhIGRlIGxhIHBhdXNhIHBhcmVudGFsIiwib2JqZWN0aXZlIjoiTW9kZWxhciBsYSBhdXRvcnJlZ3VsYWNpw7NuIGNhbG3DoW5kb25vcyBhbnRlcyBkZSBjb3JyZWdpci4iLCJhY3Rpb24iOiJIb3kgcHJhY3RpY2EgZWwgYXV0b2NvbnRyb2wgYWR1bHRvOiBhbnRlcyBkZSByZXNwb25kZXIgY29uIGdyaXRvcyBvIGZydXN0cmFjacOzbiBhbnRlIHVuIG1hbCBjb21wb3J0YW1pZW50bywgZGV0ZW50ZSwgcmVzcGlyYSBwcm9mdW5kYW1lbnRlIGR1cmFudGUgNSBzZWd1bmRvcyB5IGhhYmxhIGVuIHVuIHRvbm8gYmFqby4iLCJleGFtcGxlcyI6WyJTZW50aXIgZWwgaW1wdWxzbyBkZSBncml0YXIg4p6UIERldGVuZXJzZSDinpQgUmVzcGlyYXIgcHJvZnVuZG8g4p6UIEhhYmxhciBwYXVzYWRvLiIsIkRlY2lyOiAnRXN0b3kgbXV5IGVub2phZG8gYWhvcmEgbWlzbW8sIHRvbWFyw6kgdW4gbWludXRvIHBhcmEgY2FsbWFybWUgeSBsdWVnbyBoYWJsYW1vcycuIl0sInF1b3RlIjoiTW9kZWxhciBlbCBhdXRvY29udHJvbCBlcyBsYSDDum5pY2EgZm9ybWEgcmVhbCBkZSBlbnNlw7FhciBhdXRvY29udHJvbCBhIG51ZXN0cm9zIGhpam9zLiIsImNhdGVnb3J5IjoiZW1vdGlvbnMifSx7ImRheSI6MTcsIndlZWsiOjMsInRpdGxlIjoiRG9ybWlyIHNpbiBlc3Ryw6lzOiByaXR1YWwgZGUgbm9jaGUiLCJvYmplY3RpdmUiOiJGYWNpbGl0YXIgZWwgZGVzY2Fuc28gcmVwYXJhZG9yIHJlZHVjaWVuZG8gZWwgY29ydGlzb2wgbm9jdHVybm8uIiwiYWN0aW9uIjoiU2lndWUgZXN0cmljdGFtZW50ZSB1biByaXR1YWwgdHJhbnF1aWxvIHkgcHJlZGVjaWJsZSBhbnRlcyBkZSBkb3JtaXIsIGJhamFuZG8gbGEgZXN0aW11bGFjacOzbiBkZWwgaG9nYXIgYWwgbWVub3MgMzAgbWludXRvcyBhbnRlcy4iLCJleGFtcGxlcyI6WyJEYXIgdW4gYmHDsW8gdGliaW8g4p6UIFBvbmVyc2UgbGEgcGlqYW1hIOKelCBMdXogY8OhbGlkYSB0ZW51ZSDinpQgTGVlciB1biBjdWVudG8gY29uIHRvbm8gZGUgdm96IHN1YXZlLiIsIkNlcnJhciBsYSBub2NoZSBjb24gdW5hIGZyYXNlIGZpamEgZGUgZGVzcGVkaWRhOiAnQnVlbmFzIG5vY2hlcywgZXN0w6FzIHNlZ3VybywgZXJlcyBhbWFkbywgcHVlZGVzIGRlc2NhbnNhcicuIl0sInF1b3RlIjoiTGEgcHJldmlzaWJpbGlkYWQgeSBsYSBjYWxtYSByZWR1Y2VuIHVuIDUwJSBsb3MgZGVzcGVydGFyZXMgbm9jdHVybm9zIHkgZmFjaWxpdGFuIGNvbmNpbGlhciBlbCBzdWXDsW8uIiwiY2F0ZWdvcnkiOiJyb3V0aW5lcyJ9LHsiZGF5IjoxOCwid2VlayI6MywidGl0bGUiOiJUaWVtcG8gZGUgY2FsaWRhZCBzaW4gcGFudGFsbGFzIiwib2JqZWN0aXZlIjoiR2FyYW50aXphciBtb21lbnRvcyBkZSBjb25leGnDs24gYW5hbMOzZ2ljYSBwdXJhIGRpYXJpYW1lbnRlLiIsImFjdGlvbiI6IkVzdGFibGVjZSB1biBwZXJpb2RvIGRlIDE1IG1pbnV0b3MgZW4gZWwgZMOtYSB0b3RhbG1lbnRlIGxpYnJlIGRlIGRpc3Bvc2l0aXZvcyBwYXJhIHRvZGEgbGEgZmFtaWxpYSwgZGVkaWNhZG8gYSB1bmEgYWN0aXZpZGFkIHJlY3JlYXRpdmEgZsOtc2ljYSBvIGNyZWF0aXZhLiIsImV4YW1wbGVzIjpbIkhhY2VyIHVuYSBydXRpbmEgY29ydGEgZGUgeW9nYSBpbmZhbnRpbCBvIGVzdGlyYW1pZW50b3MuIiwiSnVnYXIgdW4ganVlZ28gZGUgbWVzYSByw6FwaWRvIG8gY29vcGVyYXRpdm8uIiwiRGFyIHVuIHBhc2VvIGNvcnRvIGFscmVkZWRvciBkZSBsYSBtYW56YW5hIGNvbnZlcnNhbmRvLiJdLCJxdW90ZSI6IkxhIG94aXRvY2luYSBnZW5lcmFkYSBlbiBhY3RpdmlkYWRlcyBjb21wYXJ0aWRhcyBmb3J0YWxlY2UgbG9zIGxhem9zIHkgcmVkdWNlIGxvcyBiZXJyaW5jaGVzLiIsImNhdGVnb3J5IjoiY29ubmVjdGlvbiJ9LHsiZGF5IjoxOSwid2VlayI6MywidGl0bGUiOiJQcmFjdGljYXIgc29sdWNpw7NuIGRlIHByb2JsZW1hcyBlbiBmYW1pbGlhIiwib2JqZWN0aXZlIjoiRGVzYXJyb2xsYXIgZWwgcGVuc2FtaWVudG8gY3LDrXRpY28geSBsYSBhdXRvbm9tw61hIGRlbCBuacOxby4iLCJhY3Rpb24iOiJDdWFuZG8gc3VyamEgdW4gY29uZmxpY3RvIHBlcXVlw7FvIChlai4gcGVsZWFzIHBvciB1biBqdWd1ZXRlKSwgbm8gZGVzIGxhIHNvbHVjacOzbiBkZSBpbm1lZGlhdG8uIFNpZ3VlIGVsIG1vZGVsbyBkZSA1IHBhc29zIHBhcmEgcmVzb2x2ZXJsbyBqdW50b3MuIiwiZXhhbXBsZXMiOlsiMS4gwr9RdcOpIHBhc8OzPyAyLiDCv1F1w6kgbmVjZXNpdGFtb3MgY2FkYSB1bm8/IDMuIMK/UXXDqSBvcGNpb25lcyBkZSBzb2x1Y2nDs24gdGVuZW1vcz8gNC4gwr9DdcOhbCBlbGVnaW1vcz8gNS4gwr9RdcOpIGFwcmVuZGltb3M/Il0sInF1b3RlIjoiRm9ybWFyIGxhIGNhcGFjaWRhZCBkZSByZXNvbHZlciBwcm9ibGVtYXMgZGUgZm9ybWEgYXV0w7Nub21hIGVzIGVsIG1heW9yIHJlZ2FsbyBkZSByZXNwb25zYWJpbGlkYWQuIiwiY2F0ZWdvcnkiOiJjb2V4aXN0In0seyJkYXkiOjIwLCJ3ZWVrIjozLCJ0aXRsZSI6IlJpdHVhbCBmYW1pbGlhciBkZSBncmF0aXR1ZCIsIm9iamVjdGl2ZSI6IkVudHJlbmFyIGVsIGNlcmVicm8gcGFyYSBlbmZvY2FyIGxvIHBvc2l0aXZvIGRlbCBkw61hLiIsImFjdGlvbiI6IkFudGVzIGRlIGRvcm1pciBvIGR1cmFudGUgbGEgY2VuYSwgY29tcGFydGFuIHVuIGPDrXJjdWxvIGRlIGdyYXRpdHVkIGRvbmRlIGNhZGEgbWllbWJybyBtZW5jaW9uZSB1bmEgY29zYSBidWVuYSBkZSBzdSBkw61hLiIsImV4YW1wbGVzIjpbIjEgY29zYSBidWVuYSBxdWUgbWUgcGFzw7MgaG95LiIsIjEgbG9ncm8gcGVyc29uYWwgKHBvciBwZXF1ZcOxbyBxdWUgc2VhKS4iLCIxIGFncmFkZWNpbWllbnRvIGEgYWxndWllbiBkZSBsYSBmYW1pbGlhLiJdLCJxdW90ZSI6IkxhIGdyYXRpdHVkIGRpYXJpYSBtZWpvcmEgZWwgYmllbmVzdGFyIGVtb2Npb25hbCBkZSB0b2RhIGxhIGZhbWlsaWEgeSBjb2hlc2lvbmEgZWwgaG9nYXIuIiwiY2F0ZWdvcnkiOiJjb25uZWN0aW9uIn0seyJkYXkiOjIxLCJ3ZWVrIjozLCJ0aXRsZSI6IkNpZXJyZSwgaW50ZWdyYWNpw7NuIHkgY2VsZWJyYWNpw7NuIiwib2JqZWN0aXZlIjoiQ29uc29saWRhciBsb3MgbnVldm9zIGjDoWJpdG9zIHkgY2VsZWJyYXIgbGEgdHJhbnNmb3JtYWNpw7NuIGRlbCBob2dhci4iLCJhY3Rpb24iOiJIYWdhbiB1bmEgcmV1bmnDs24gZXNwZWNpYWwgcGFyYSBldmFsdWFyIGxvcyBjYW1iaW9zIGxvZ3JhZG9zIGVuIGVzdG9zIDIxIGTDrWFzLiBFbnRyZWd1ZW4gZWwgJ0NlcnRpZmljYWRvIGRlIEZhbWlsaWEgQ29sYWJvcmFkb3JhJyBhIGxvcyBuacOxb3MgeSBjZWxlYnJlbiBqdW50b3MuIiwiZXhhbXBsZXMiOlsiwr9RdcOpIHJ1dGluYXMgc2UgcXVlZGFyw6FuIHBhcmEgc2llbXByZT8iLCLCv0PDs21vIG5vcyBzZW50aW1vcyBhaG9yYSBlbiBjb21wYXJhY2nDs24gY29uIGVsIETDrWEgMT8iLCLCoUZlbGljaWRhZGVzLCBzb24gdW4gZXF1aXBvIGV4dHJhb3JkaW5hcmlvISJdLCJxdW90ZSI6IkVzdGUgcGxhbiBubyBidXNjYSBsYSBwZXJmZWNjacOzbiwgYnVzY2EgZWwgcHJvZ3Jlc28gY29uc3RhbnRlLCBsYSBjb25leGnDs24gcHJvZnVuZGEgeSBlbCBlcXVpbGlicmlvIGFtb3Jvc28uIiwiY2F0ZWdvcnkiOiJjb25uZWN0aW9uIn1d")))),
+                conflictDatabase: JSON.parse(decodeURIComponent(escape(atob("eyJzY3JlZW5zIjp7ImlkIjoic2NyZWVucyIsInRpdGxlIjoiQmVycmluY2hlIHBvciBQYW50YWxsYXMvVGFibGV0IiwiaWNvbiI6IvCfk7EiLCJkZXNjcmlwdGlvbiI6IkRpZmljdWx0YWQgcGFyYSBhcGFnYXIgZGlzcG9zaXRpdm9zLCBncml0b3MgbyBlbmZhZG9zIGFsIHJldGlyYXIgbGEgdGFibGV0LiIsInNjaWVuY2VUaXAiOiJMYSBsdXogYXp1bCB5IGxhIGRvcGFtaW5hIGFydGlmaWNpYWwgZGUgbGFzIHBhbnRhbGxhcyBoaXBub3RpemFuIGVsIGNlcmVicm8gZGVsIG5pw7FvLiBBbCBhcGFnYXJsYSBicnVzY2FtZW50ZSwgc3VzIG5pdmVsZXMgZGUgZG9wYW1pbmEgY2FlbiwgcHJvdm9jYW5kbyB1biBiZXJyaW5jaGUgcXXDrW1pY28gcmVhbC4gTm8gZXMgY2FwcmljaG8sIGVzIGFic3RpbmVuY2lhIGJpb2zDs2dpY2EgdGVtcG9yYWwuIiwicGFyZW50TW9vZEd1aWRlIjp7InN0cmVzc2VkIjoiRXN0w6FzIGJham8gZXN0csOpcy4gQWzDqWphdGUgdW4gbWV0cm8gZsOtc2ljYSB5IG1lbnRhbG1lbnRlIGRlIGxhIHBhbnRhbGxhLiBEaSBwYXJhIHRpIG1pc21vOiAnTm8gZXMgY29udHJhIG3DrSwgZXMgdW4gY2VyZWJybyBpbm1hZHVybyBkZXNib3JkYWRvJy4gVG9tYSB1bmEgaW5oYWxhY2nDs24gaG9uZGEuIiwiZXhoYXVzdGVkIjoiRXN0w6FzIHNpbiBlbmVyZ8OtYS4gTm8gZW50cmVzIGVuIGRlYmF0ZXMgbMOzZ2ljb3MgZGUgMjAgbWludXRvcyBjb24gdHUgaGlqby4gRWwgbMOtbWl0ZSBkZWJlIHNlciBzaW1wbGUgeSBzaWxlbmNpb3NvLiBUdSBwcmVzZW5jaWEgYWZlY3R1b3NhIHkgcG9jYXMgcGFsYWJyYXMgYmFzdGFyw6FuLiIsInJ1c2hlZCI6IlRpZW5lcyBwcmlzYSBwb3IgcGFzYXIgYSBvdHJhIGFjdGl2aWRhZC4gUmVzcGlyYSBsZW50by4gQXByZXN1cmFyIHVuIGJlcnJpbmNoZSBkZSBwYW50YWxsYXMgc29sbyBsbyBhbGFyZ2EuIEludmllcnRlIDMgbWludXRvcyBlbiBjb25lY3RhciBwYXJhIGFob3JyYXJ0ZSAzMCBtaW51dG9zIGRlIGRyYW1hLiIsImNhbG0iOiLCoUV4Y2VsZW50ZSEgRXN0w6FzIGVuIGVsIGVzdGFkbyDDs3B0aW1vLiBVdGlsaXphIHR1IHRvbm8gZGUgdm96IHN1YXZlIGNvbW8gdW4gYW5jbGEgcGFyYSBndWlhciBlbCBkZXNib3JkZSBkb3BhbWluw6lyZ2ljbyBkZWwgbmnDsW8uIn0sImFnZVRpcHMiOnsiMC0yIjp7ImFjb21wYW55IjoiVXNhIHBhbGFicmFzIG11eSBicmV2ZXMsIGFicmF6b3Mgc2kgbG8gcGVybWl0ZSB5IGRlc3bDrWEgc3UgYXRlbmNpw7NuIGbDrXNpY2EuICdTw6kgcXVlIHRlIGd1c3RhLiBZYSB0ZXJtaW7Dsy4gVmVuLCBtaXJlbW9zIGVzdGUgcGVycml0byBkZSBwZWx1Y2hlJy4iLCJsaW1pdCI6IkxhIHRhYmxldCBzZSBndWFyZGEgY29uIHN1YXZpZGFkLiBObyBsYSBhcnJhbnF1ZXMgYnJ1c2NhbWVudGUgZGUgc3VzIG1hbm9zLiAnU2UgZ3VhcmTDsyBsYSB0YWJsZXQuIEVzIGhvcmEgZGUgY2VuYXInLiIsIm1vZGVsIjoiTWFudMOpbiB1biByb3N0cm8gdHJhbnF1aWxvLCBzaW4gdGVuc2nDs24gZW4gbGEgbWFuZMOtYnVsYSwgeSBldml0YSByZWdhw7Fhci4iLCJhY3RpdmF0ZSI6IkV2aXRhIGRhciBwYW50YWxsYXMgYW50ZXMgZGUgZG9ybWlyIG8gY29tZXIuIFVzYSB0cmFuc2ljaW9uZXMgdMOhY3RpbGVzIChlbnRyZWdhcmxlIHVuIGp1Z3VldGUgZsOtc2ljbyBhbnRlcyBkZSBhcGFnYXIgbGEgcGFudGFsbGEpLiJ9LCIzLTUiOnsiYWNvbXBhbnkiOiJWYWxpZGEgbGEgZnJ1c3RyYWNpw7NuIGludGVuc2E6ICdFc3RhYmFzIG11eSBkaXZlcnRpZG8ganVnYW5kby4gVGUgZW5vamEgbXVjaG8gYXBhZ2FyIGxhIHRhYmxldCwgbG8gc8OpLiBFcyBkaWbDrWNpbCBwYXJhciBkZSBqdWdhciBjdWFuZG8gbm9zIGd1c3RhIHRhbnRvJy4iLCJsaW1pdCI6IkVsIGzDrW1pdGUgZXMgY2xhcm86ICdFbCB0aWVtcG8gZGUgcGFudGFsbGEgdGVybWluw7MgcG9yIGhveS4gUG9kZW1vcyB2b2x2ZXIgYSBqdWdhciBtYcOxYW5hIGRlc3B1w6lzIGRlIGhhY2VyIGxhIHNpZXN0YScuIiwibW9kZWwiOiJBZ8OhY2hhdGUgYSBzdSBuaXZlbCBvY3VsYXIsIHBvbiB0dSBtYW5vIGVuIHN1IGhvbWJybyBzaSBsbyBwZXJtaXRlLCBtYW50w6luIHR1cyBob21icm9zIHJlbGFqYWRvcyB5IG1hbm9zIGFiaWVydGFzLiIsImFjdGl2YXRlIjoiVXNhIHVuIGNyb27Ds21ldHJvIHZpc3VhbCBvIHVuICdyZWxvaiBkZSBhcmVuYScuIEhheiBhY3VlcmRvcyBwcmV2aW9zOiAnQWwgc29uYXIgbGEgYWxhcm1hIGRlIGNhbXBhbmEsIHTDuiBtaXNtbyBhcGFnYXMgbGEgcGFudGFsbGEnLiJ9LCI2LTkiOnsiYWNvbXBhbnkiOiJDb25lY3RhIGNvbiBzdSBpbnRlcsOpczogJ8KhUXXDqSBncmFuIHBhcnRpZGEgZGUganVlZ28gZXN0YWJhcyBoYWNpZW5kbyEgU2Ugbm90YSBxdWUgdGUgYXBhc2lvbmEgeSB0ZSBlc2Z1ZXJ6YXMuIEN1ZXN0YSBtdWNobyBkZXRlbmVyc2UgY3VhbmRvIGVsIGp1ZWdvIGVzdMOhIHRhbiBlbW9jaW9uYW50ZScuIiwibGltaXQiOiJMw61taXRlIGZpcm1lOiAnQ3VtcGxpbW9zIGVsIGFjdWVyZG8gZGUgMzAgbWludXRvcy4gRXMgaG9yYSBkZSBiYcOxYXJzZS4gVGUgYXl1ZG8gYSBndWFyZGFyIHR1IHBhcnRpZGEgZW4gZXN0ZSBtb21lbnRvJy4iLCJtb2RlbCI6IkV2aXRhIGRhciBzZXJtb25lcyBpbnRlcm1pbmFibGVzIG8gZnJhc2VzIGNvbW8gJ3RlIGxvIGFkdmVydMOtJy4gVHUgdG9ubyBkZWJlIHNlciBmaXJtZSBwZXJvIG5ldXRybyB5IGVtcMOhdGljby4iLCJhY3RpdmF0ZSI6IkNyZWEgdW5hIHJ1dGluYSBkZSBwYW50YWxsYXMgZW4gZmFtaWxpYSBjb24gaG9yYXJpb3MgdmlzaWJsZXMgZW4gZWwgcmVmcmlnZXJhZG9yLiBRdWUgZWwgYXBhZ2FkbyB2ZW5nYSBzZWd1aWRvIGRlIHVuYSBhY3RpdmlkYWQgZGUgY29uZXhpw7NuIGbDrXNpY2EgKGVqLiBsdWNoYSBkZSBhbG1vaGFkYXMgbyBjb2NpbmFyIGp1bnRvcykuIn0sIjEwKyI6eyJhY29tcGFueSI6IlJlY29ub2NlIHN1IGF1dG9ub23DrWEgeSB2aWRhIHNvY2lhbDogJ0VudGllbmRvIHF1ZSBxdWVyw61hcyB0ZXJtaW5hciBlc2EgcGFydGlkYSBlbiBsw61uZWEgY29uIHR1cyBhbWlnb3MuIFPDqSBxdWUgZGEgbXVjaGEgcmFiaWEgdGVuZXIgcXVlIGRlc2NvbmVjdGFyc2UganVzdG8gZW4gbWVkaW8nLiIsImxpbWl0IjoiTMOtbWl0ZSBuZWdvY2lhZG86ICdTw6kgcXVlIGVzIGRpZsOtY2lsLCBwZXJvIGFjb3JkYW1vcyBxdWUgYSBsYXMgOCBwLm0uIGFwYWdhbW9zIHBhbnRhbGxhcy4gQ29uZsOtbyBlbiBxdWUgY3VtcGxpcsOhcyB0dSBwYWxhYnJhIGRlIGhvbm9yJy4iLCJtb2RlbCI6Ik5vIGNhaWdhcyBlbiBsYSBsdWNoYSBkZSBwb2RlciBpbnRlbGVjdHVhbCBvIGRpc2N1c2lvbmVzIGRlIGFib2dhZG9zLiBNYW50w6luIHR1cyBtYW5vcyBhYmllcnRhcyB5IGV2aXRhIGNydXphcnRlIGRlIGJyYXpvcy4iLCJhY3RpdmF0ZSI6Ikludm9sw7pjcmFsb3MgZW4gbGEgY3JlYWNpw7NuIGRlbCBjb250cmF0byBkaWdpdGFsIGZhbWlsaWFyLiBFc3RhYmxlemNhbiB6b25hcyBsaWJyZXMgZGUgcGFudGFsbGFzIGVuIHRvZGEgbGEgY2FzYSAoY29tZWRvciB5IGhhYml0YWNpb25lcykuIn19fSwiYmVkdGltZSI6eyJpZCI6ImJlZHRpbWUiLCJ0aXRsZSI6IlJlc2lzdGVuY2lhIGFsIERvcm1pciAvIEJhdGFsbGFzIE5vY3R1cm5hcyIsImljb24iOiLwn5uMIiwiZGVzY3JpcHRpb24iOiJTZSByZXNpc3RlIGEgYWNvc3RhcnNlLCBwaWRlIGFndWEgbyBjdWVudG9zIG1pbCB2ZWNlcywgbGxvcmEgbyBzZSBzYWxlIGRlIGxhIGhhYml0YWNpw7NuIGNvbnN0YW50ZW1lbnRlLiIsInNjaWVuY2VUaXAiOiJFbCBjZXJlYnJvIGluZmFudGlsIGFzb2NpYSBlbCBtb21lbnRvIGRlIGRvcm1pciBjb24gbGEgc2VwYXJhY2nDs24gZsOtc2ljYSB5IGVtb2Npb25hbCBkZSBzdXMgY3VpZGFkb3Jlcy4gTGEgcmVzaXN0ZW5jaWEgc3VlbGUgc2VyIGFuc2llZGFkIGRlIHNlcGFyYWNpw7NuIGVuY3ViaWVydGEgbyBzb2JyZS1lc3RpbXVsYWNpw7NuIHNlbnNvcmlhbCBxdWUgaW1waWRlIGxpYmVyYXIgbWVsYXRvbmluYS4iLCJwYXJlbnRNb29kR3VpZGUiOnsic3RyZXNzZWQiOiJFbCBmaW4gZGUgZMOtYSBub3MgZW5jdWVudHJhIGNhbnNhZG9zIGEgdG9kb3MuIFR1IGNvcnRpc29sIGFsdG8gYWN0aXZhIGxhIGFsZXJ0YSBkZSBwZWxpZ3JvIGRlbCBuacOxby4gSGF6IHVuIHN1c3Bpcm8gYXVkaWJsZSBwcm9sb25nYWRvIHBhcmEgaW5kaWNhcmxlIGEgc3UgY2VyZWJybyBxdWUgZXMgc2VndXJvIGRvcm1pci4iLCJleGhhdXN0ZWQiOiJFc3TDoXMgYWdvdGFkbyB5IGRlc2VhcyB0dSBlc3BhY2lvLiBNYW50w6luIGxhIHJ1dGluYSBleHRyZW1hZGFtZW50ZSBwcmVkZWNpYmxlIHkgaGFibGEgZW4gdW4gc3VzdXJyby4gRWwgc3VzdXJybyBiYWphIGF1dG9tw6F0aWNhbWVudGUgZWwgcHVsc28gZGUgYW1ib3MuIiwicnVzaGVkIjoiUXVpZXJlcyBxdWUgc2UgZHVlcm1hIHLDoXBpZG8gcGFyYSB0ZW5lciB0aWVtcG8gbGlicmUuIFR1IHByaXNhIGdlbmVyYSB0ZW5zacOzbiB5IGZyZW5hIHN1IHN1ZcOxbyBkZSBpbm1lZGlhdG8uIFJlZ8OhbGF0ZSAxMCBtaW51dG9zIGRlIHB1cmEgY29uZXhpw7NuIHNpbiBwZW5zYXIgZW4gZWwgcmVsb2ouIiwiY2FsbSI6IsKhRmFudMOhc3RpY28hIEhheiBjb250YWN0byBmw61zaWNvIHJlbGFqYWRvIChjYXJpY2lhcyBlbiBsYSBlc3BhbGRhKS4gVHUgcmVzcGlyYWNpw7NuIHLDrXRtaWNhIHkgcHJvZnVuZGEgZ3VpYXLDoSBzdSB0cmFuc2ljacOzbiBoYWNpYSBlbCBzdWXDsW8uIn0sImFnZVRpcHMiOnsiMC0yIjp7ImFjb21wYW55IjoiQXJydWxsYSwgbWVjZSB5IHRhcmFyZWEgc3VhdmVtZW50ZS4gJ01hbcOhIGVzdMOhIGFxdcOtLCBlc3TDoXMgY2FsaWVudGl0byB5IGEgc2Fsdm8sIGVzIGhvcmEgZGUgZGVzY2Fuc2FyJy4gVHUgcGllbCBlcyBzdSByZWd1bGFkb3IgcHJpbmNpcGFsLiIsImxpbWl0IjoiTm8gY2FtYmllcyBsYXMgcmVnbGFzIGRlbCBzdWXDsW8gYSBtaXRhZCBkZSBsYSBub2NoZSBwYXJhIGFjYWJhciBhbnRlcy4gTWFudMOpbiBsYXMgbHVjZXMgYmFqYXMgeSBlbCBzaWxlbmNpby4gJ1NoaC4uLiBlcyBob3JhIGRlIGRvcm1pcicuIiwibW9kZWwiOiJDaWVycmEgdHVzIHByb3Bpb3Mgb2pvcyBwb3IgbW9tZW50b3MsIHJlc3BpcmEgZGUgbWFuZXJhIHByb2Z1bmRhIHkgc29ub3JhIGFsIHNvc3RlbmVybG8gZW4gYnJhem9zLiIsImFjdGl2YXRlIjoiUnV0aW5hIGZpamEgZGUgMyBwYXNvcyBpZMOpbnRpY29zIHRvZGFzIGxhcyBub2NoZXM6IEJhw7FvLCBNYXNhamUgY29uIGNyZW1hL1BpamFtYSwgTGFjdGFuY2lhL0N1ZW50byBicmV2ZS4ifSwiMy01Ijp7ImFjb21wYW55IjoiVmFsaWRhIHN1IHRlbW9yIG8gZGVzZW8gZGUgZXN0YXIgY29udGlnbzogJ1PDqSBxdWUgcXVpZXJlcyBzZWd1aXIgZGVzcGllcnRvIGp1Z2FuZG8gY29ubWlnby4gTWUgZW5jYW50YSBlc3RhciBhIHR1IGxhZG8uIFBlcm8gdHUgY3VlcnBlY2l0byBuZWNlc2l0YSByZWNhcmdhciBlbmVyZ8OtYSBwYXJhIG1hw7FhbmEnLiIsImxpbWl0IjoiTMOtbWl0ZSBzdWF2ZSBwZXJvIGZpcm1lOiAnTGXDrW1vcyBsb3MgZG9zIGN1ZW50b3MgYWNvcmRhZG9zLiBBaG9yYSBhcGFnbyBsYSBsdXogZ3JhbmRlLCBlbmNpZW5kbyBsYSBsdXogZGUgbm9jaGUgeSBtZSBxdWVkbyBzZW50YWRvIGFxdcOtIGhhc3RhIHF1ZSBjaWVycmVzIHR1cyBvaml0b3MnLiIsIm1vZGVsIjoiTm8gcmVzcG9uZGFzIGNvbiBmcnVzdHJhY2nDs24gbyBncml0b3MgYSBzdXMgcGV0aWNpb25lcyBjcmVhdGl2YXMgZGUgYWd1YSBvIHBpcMOtLiBSZXN1ZWx2ZSBsYSBuZWNlc2lkYWQgZGUgZm9ybWEgYWJ1cnJpZGEsIHJvYsOzdGljYSB5IHNpbiBhYnJpciB0ZW1hcyBkZSBjb252ZXJzYWNpw7NuLiIsImFjdGl2YXRlIjoiQ3JlYSB1bmEgVGFibGEgZGUgUnV0aW5hIGRlIERvcm1pciB2aXN1YWwgKHBvbmVyc2UgcGlqYW1hLCBjZXBpbGxhciBkaWVudGVzLCBsZWVyIGN1ZW50bywgYXBhZ2FyIGx1eikuIERlamEgcXVlIMOpbCBtaXNtbyB0YWNoZSBsYXMgdGFyZWFzIGNvbiBwZWdhdGluYXMuIn0sIjYtOSI6eyJhY29tcGFueSI6IkVzY3VjaGEgc3VzIG1pZWRvcyBkZWwgZMOtYTogJ0EgdmVjZXMgZW4gbGEgY2FtYSB2aWVuZW4gcGVuc2FtaWVudG9zIGFzdXN0YWRpem9zLiBFcyBub3JtYWwuIEN1w6ludGFtZSBxdcOpIGhheSBlbiB0dSBtZW50ZSB5IGxvIGd1YXJkYW1vcyBlbiBlc3RhIGNhaml0YSBpbWFnaW5hcmlhIHBhcmEgcmVzb2x2ZXJsbyBtYcOxYW5hJy4iLCJsaW1pdCI6IkVzdGFibGVjZSByZWdsYXMgY2xhcmFzIGRlIHBlcm1hbmVuY2lhOiAnUHVlZGVzIGxlZXIgbyBtaXJhciB0dXMgZGlidWpvcyBlbiB0dSBjYW1hIDEwIG1pbnV0b3MgbcOhcywgcGVybyBhIGxhcyA5IHAubS4gZXMgaG9yYSBkZSBhcGFnYXIgbGEgbMOhbXBhcmEnLiIsIm1vZGVsIjoiU2kgc2UgbGV2YW50YSBkZSBsYSBjYW1hLCByZWdyw6lzYWxvIGRlIGxhIG1hbm8gY29uIGNhbG1hLCBlbiBzaWxlbmNpbywgY29uIGFmZWN0byBwZXJvIHNpbiBhYnJpciBjb252ZXJzYWNpb25lcyBvIG5lZ29jaWFjaW9uZXMgbm9jdHVybmFzLiIsImFjdGl2YXRlIjoiRm9tZW50YSBsYSBhdXRvcnJlZ3VsYWNpw7NuIGNvbiBtw7pzaWNhIHJlbGFqYW50ZSBpbnN0cnVtZW50YWwgZGUgZm9uZG8gbyB1biBwZWx1Y2hlIGd1YXJkacOhbiBxdWUgw6lsIGVsaWphIHBhcmEgcHJvdGVnZXIgc3VzIHN1ZcOxb3MuIn0sIjEwKyI6eyJhY29tcGFueSI6IlJlc3BldGEgc3UgbmVjZXNpZGFkIGRlIGRlc2NvbXByZXNpw7NuIHBlcnNvbmFsOiAnU8OpIHF1ZSBsYSBub2NoZSBlcyB0dSBtb21lbnRvIGRlIHRyYW5xdWlsaWRhZCBwYXJhIHBlbnNhciBlbiB0dXMgY29zYXMgZGUgbGEgZXNjdWVsYSwgbcO6c2ljYSB5IHR1cyBhbWlnb3MnLiIsImxpbWl0IjoiTm9ybWFzIGRlIGhpZ2llbmUgZGVsIHN1ZcOxbzogJ0xvcyB0ZWzDqWZvbm9zIHkgcGFudGFsbGFzIHNlIGNhcmdhbiBmdWVyYSBkZSBsYXMgaGFiaXRhY2lvbmVzIGEgcGFydGlyIGRlIGxhcyAxMCBwLm0uIFR1IGNlcmVicm8gbmVjZXNpdGEgOSBob3JhcyBkZSBkZXNjYW5zbycuIiwibW9kZWwiOiJEYSBlbCBlamVtcGxvIGFwYWdhbmRvIHR1cyBwcm9waW9zIGRpc3Bvc2l0aXZvcyBhbnRlcyBkZSBlbnRyYXIgYSBzdSBoYWJpdGFjacOzbiBhIGRhcmxlIGxhcyBidWVuYXMgbm9jaGVzIGNvbiB1biBhYnJhem8gcmVzcGV0dW9zby4iLCJhY3RpdmF0ZSI6IkVzdGFibGV6Y2FuIHVuYSBob3JhIGRlIHNpbGVuY2lvIGVuIHRvZGEgbGEgY2FzYS4gRm9tZW50YSBow6FiaXRvcyBzYWx1ZGFibGVzIGRlIGxlY3R1cmEgZsOtc2ljYSBvIGVzY3JpdHVyYSBkZSBkaWFyaW8gYW50ZXMgZGUgYXBhZ2FyIGxhIGx1ei4ifX19LCJjb2xsYWJvcmF0aW9uIjp7ImlkIjoiY29sbGFib3JhdGlvbiIsInRpdGxlIjoiRmFsdGEgZGUgQ29sYWJvcmFjacOzbiAoTm8gb3JkZW5hIGp1Z3VldGVzIC8gTm8gcmVjb2dlKSIsImljb24iOiLwn6e5IiwiZGVzY3JpcHRpb24iOiJUZSBpZ25vcmEgY3VhbmRvIGxlIHBpZGVzIG9yZGVuYXIgc3UgaGFiaXRhY2nDs24sIGd1YXJkYXIganVndWV0ZXMgbyBwb25lciBsYSBtZXNhLiIsInNjaWVuY2VUaXAiOiJMYXMgaW5zdHJ1Y2Npb25lcyBhYnN0cmFjdGFzIGNvbW8gJ2xpbXBpYSB0dSBjdWFydG8nIGFicnVtYW4gZWwgY2VyZWJybyBlamVjdXRpdm8gZGVsIG5pw7FvLCBxdWUgYcO6biBubyBzYWJlIHNlY3VlbmNpYXIgdGFyZWFzIGNvbXBsZWphcy4gU3UgcmViZWxkw61hIHN1ZWxlIHNlciBmcnVzdHJhY2nDs24gYW50ZSB1bmEgb3JkZW4gdmFnYSBvIGZhbHRhIGRlIGNvbmV4acOzbi4iLCJwYXJlbnRNb29kR3VpZGUiOnsic3RyZXNzZWQiOiJTaSBncml0YXMgbGEgb3JkZW4gZGVzZGUgbGEgY29jaW5hLCBlbCBuacOxbyBsYSBwcm9jZXNhIGNvbW8gdW5hIGFncmVzacOzbiBzb25vcmEgeSBzZSBibG9xdWVhLiBEZXRlbnRlLiBDYW1pbmEgaGFjaWEgw6lsLCBwb250ZSBkZSByb2RpbGxhcyB5IGhheiBjb250YWN0byB2aXN1YWwgYW50ZXMgZGUgaGFibGFyLiIsImV4aGF1c3RlZCI6IkRpdmlkZSBsYSB0YXJlYSBlbiBwYXNvcyByaWTDrWN1bGFtZW50ZSBwZXF1ZcOxb3MgeSBoYXogbGEgcHJpbWVyYSBwYXJ0ZSB0w7ogcGFyYSBwcmVuZGVyIHN1IG1vdG9yIGRlIGltaXRhY2nDs24uIiwicnVzaGVkIjoiRXMgdGVudGFkb3IgaGFjZXJsbyB0w7ogcGFyYSBhY2FiYXIgcsOhcGlkbywgcGVybyBsZSBxdWl0YXMgbGEgb3BvcnR1bmlkYWQgZGUgYXByZW5kZXIgcmVzcG9uc2FiaWxpZGFkLiBEYWxlIHRpZW1wbyB5IGVzdHJ1Y3R1cmEuIiwiY2FsbSI6IlV0aWxpemEgZWwganVlZ28gbyBsYSBmYW50YXPDrWEgcGFyYSBoYWNlciBxdWUgbGEgdGFyZWEgc2VhIHVuIHJldG8gZGUgY29uZXhpw7NuIGVuIGx1Z2FyIGRlIHVuYSBvYmxpZ2FjacOzbiBhYnVycmlkYS4ifSwiYWdlVGlwcyI6eyIwLTIiOnsiYWNvbXBhbnkiOiJBc2lzdGUgZsOtc2ljYW1lbnRlIGRlIGlubWVkaWF0by4gTm8gZGVzIMOzcmRlbmVzIGRlIGxlam9zLiAnwqFFcyBob3JhIGRlIHJlY29nZXIhIEd1YXJkZW1vcyBsb3MgY3Vib3Mgcm9qb3MuIMKhQWwgY2Fqw7NuISciLCJsaW1pdCI6Ik1hbnTDqW4gcG9jb3MganVndWV0ZXMgYWwgYWxjYW5jZSBwYXJhIGV2aXRhciBxdWUgZWwgZGVzb3JkZW4gbG8gYWJydW1lIGRlIGVudHJhZGEuIiwibW9kZWwiOiJSZWNvZ2UgY2FudGFuZG8gdW5hIGNhbmNpw7NuIGFsZWdyZSBkZSBsaW1waWV6YSBtaWVudHJhcyDDqWwgdGUgb2JzZXJ2YSBlIGltaXRhIHBvY28gYSBwb2NvLiIsImFjdGl2YXRlIjoiVXNhIGNlc3RvcyBncmFuZGVzLCBhYmllcnRvcyB5IGV0aXF1ZXRhZG9zIGNvbiBkaWJ1am9zIHNlbmNpbGxvcyBwYXJhIGNhZGEgdGlwbyBkZSBqdWd1ZXRlLiJ9LCIzLTUiOnsiYWNvbXBhbnkiOiJJbnZvbMO6Y3JhdGUgY29uIGRpdmVyc2nDs246ICfCoVV5LCBjdcOhbnRvcyBwZWx1Y2hlcyBjYW5zYWRvcyBlbiBlbCBzdWVsbyEgwr9Mb3MgYXl1ZGFtb3MgYSBsbGVnYXIgYSBzdSBjYXNpdGEgZGUgbGEgcmVwaXNhPycuIiwibGltaXQiOiJVc2EgZWwgcHJpbmNpcGlvIGRlIGFidWVsYTogJ0VuIGN1YW50byBsb3MganVndWV0ZXMgZXN0w6luIGR1cm1pZW5kbyBlbiBzdSBjYWphLCBzYWxkcmVtb3MgYWwgcGFycXVlIGEganVnYXInLiIsIm1vZGVsIjoiTm8gbGUgcXVpdGVzIGxvcyBqdWd1ZXRlcyBlbmZhZGFkbyBncml0YW5kbyAnwqFsb3Mgdm95IGEgdGlyYXIgYSBsYSBiYXN1cmEhJy4gRXNvIGdlbmVyYSBkZXNjb25maWFuemEsIG5vIGNvbGFib3JhY2nDs24uIiwiYWN0aXZhdGUiOiJEaXZpZGUgbGEgb3JkZW46ICdQcmltZXJvIGd1YXJkYSBsb3MgbGVnb3MsIGx1ZWdvIGxhcyBtdcOxZWNhcycuIFVzYSBlbCBqdWVnbyBkZSByb2xlcyBvIGNhcnJlcmFzIGNvbiB0ZW1wb3JpemFkb3IuIn0sIjYtOSI6eyJhY29tcGFueSI6IlBpZGUgc3Ugb3BpbmnDs246ICdWZW8gcXVlIGVzdGUgcmluY8OzbiB0aWVuZSBtdWNob3MganVndWV0ZXMgbWV6Y2xhZG9zIHkgZXMgZGlmw61jaWwgY2FtaW5hciBzaW4gcGlzYXJsb3MuIMK/Q8OzbW8gY3JlZXMgcXVlIHBvZHLDrWFtb3Mgb3JnYW5pemFybG8gaG95PycuIiwibGltaXQiOiJVc2EgYWN1ZXJkb3MgZXNjcml0b3MgbyB2aXN1YWxlczogJ051ZXN0cmEgcmVnbGEgZmFtaWxpYXIgZXMgcXVlIHJlY29nZW1vcyBsYSB6b25hIGRlIGp1ZWdvIGFudGVzIGRlIGNlbmFyLiDCv1ByZWZpZXJlcyByZWNvZ2VyIHTDuiBzb2xvIG8gcXVlIGp1Z3VlbW9zIHVuYSBjYXJyZXJhIGRlIDUgbWludXRvcz8nIiwibW9kZWwiOiJEZW11ZXN0cmEgYXByZWNpbyBzaW5jZXJvIGN1YW5kbyBjb2xhYm9yZS4gRWzDs2dpYWxvIHBvciBzdSBlc2Z1ZXJ6byBlc3BlY8OtZmljbywgbm8gZ2Vuw6lyaWNvICgnR3JhY2lhcyBwb3IgYWNvbW9kYXIgbG9zIGxpYnJvcyBwb3IgdGFtYcOxbywgc2UgdmUgZ2VuaWFsJykuIiwiYWN0aXZhdGUiOiJFc3RhYmxlemNhbiB1bmEgcnV0aW5hIGRlIHJlc3BvbnNhYmlsaWRhZGVzIGRpYXJpYXMgZmlqYSB1c2FuZG8gbGEgVGFibGEgZGUgUHVudG9zIEZhbWlsaWFyLiJ9LCIxMCsiOnsiYWNvbXBhbnkiOiJWYWxpZGEgc3UgY2Fuc2FuY2lvIGVzY29sYXI6ICdTw6kgcXVlIHZpZW5lcyBkZSB1biBkw61hIHBlc2FkbyBlbiBsYSBlc2N1ZWxhLiBBIG3DrSB0YW1iacOpbiBtZSBjdWVzdGEgb3JkZW5hciBsYSBjYXNhIGN1YW5kbyBsbGVnbyBjYW5zYWRvJy4iLCJsaW1pdCI6IkZpcm1lemEgeSByZXNwZXRvIHBvciBzdSB0aWVtcG86ICdOZWNlc2l0YW1vcyBxdWUgdHUgY3VhcnRvIGVzdMOpIGRlc3BlamFkbyBob3kgcGFyYSBwYXNhciBsYSBhc3BpcmFkb3JhLiDCv1RlIHZpZW5lIG1lam9yIG9yZGVuYXJsbyBhbnRlcyBkZSBjZW5hciBvIGRlc3B1w6lzIGRlIGhhY2VyIHR1cyB0YXJlYXM/JyIsIm1vZGVsIjoiUmVzcGV0YSBzdSBlc3BhY2lvIHByaXZhZG8gcGVybyBtYW50w6luIGVsIGVzdMOhbmRhciBkZSBoaWdpZW5lIGZhbWlsaWFyLiBEaWFsb2dhIHNpbiBzYXJjYXNtb3MgbmkgcmVwcm9jaGVzIGhpc3TDs3JpY29zLiIsImFjdGl2YXRlIjoiQ3JlYSB1bmEgbGlzdGEgc2VtYW5hbCBkZSBxdWVoYWNlcmVzIGRvbcOpc3RpY29zIGRvbmRlIGNhZGEgbWllbWJybyBkZSBsYSBmYW1pbGlhIGVsaWphIGRvcyByb2xlcyBzZWfDum4gc3UgZWRhZCB5IGd1c3Rvcy4ifX19LCJtb3JuaW5ncyI6eyJpZCI6Im1vcm5pbmdzIiwidGl0bGUiOiJNYcOxYW5hcyBDYcOzdGljYXMgeSBQcmlzYXMiLCJpY29uIjoi4piA77iPIiwiZGVzY3JpcHRpb24iOiJMbGVnYXIgdGFyZGUgYSBsYSBlc2N1ZWxhLCBuZWdhcnNlIGEgdmVzdGlyc2UgbyBkZXNheXVuYXIgcsOhcGlkbywgZ3JpdG9zIGRlIHByaXNhLiIsInNjaWVuY2VUaXAiOiJMYSBwcmlzYSBhZHVsdGEgYWN0aXZhIGxhcyBob3Jtb25hcyBkZWwgZXN0csOpcyAoY29ydGlzb2wpIGVuIGVsIG5pw7FvLiBVbiBjZXJlYnJvIGluZmFudGlsIGJham8gZXN0csOpcyBzZSBkaXN0cmFlIG3DoXMsIHNlIHZ1ZWx2ZSBtw6FzIGxlbnRvIHkgc2UgYmxvcXVlYSwgY3JlYW5kbyB1biBjw61yY3VsbyB2aWNpb3NvIGRlIGRlbW9yYXMuIiwicGFyZW50TW9vZEd1aWRlIjp7InN0cmVzc2VkIjoiRGVzcGnDqXJ0YXRlIDE1IG1pbnV0b3MgYW50ZXMgZGUgbG8gaGFiaXR1YWwgcGFyYSB0ZW5lciB1biBjb2xjaMOzbiBkZSB0aWVtcG8uIFR1IHRyYW5xdWlsaWRhZCBhbCBkZXNwZXJ0YXIgc2UgdHJhbnNtaXRlIGlubWVkaWF0YW1lbnRlLiIsImV4aGF1c3RlZCI6IkJhamEgbGEgY2FyZ2EgY29nbml0aXZhIGRlIGxhIG1hw7FhbmEuIFRvZG8gbG8gcXVlIHNlIHB1ZWRhIHByZXBhcmFyIGxhIG5vY2hlIGFudGVyaW9yIGRlYmUgZXN0YXIgbGlzdG8gKHJvcGEsIG1vY2hpbGFzLCBjb21pZGEpLiIsInJ1c2hlZCI6IlNpIHJlcGl0ZXMgJ8KhdmFtb3MgcsOhcGlkbywgc2Ugbm9zIGhhY2UgdGFyZGUhJyAyMCB2ZWNlcywgYXBhZ2FzIHN1IGNlcmVicm8gbMOzZ2ljby4gUmVlbXBsw6F6YWxvIHBvciB1biBjb250YWN0byB2aXN1YWwgeSB1biBhYnJhem8gZGUgJ2J1ZW5vcyBkw61hcycuIiwiY2FsbSI6IlVzYSB1biB0b25vIGNhbnRhcsOtbiB5IGFsZWdyZS4gQ29udmllcnRlIGxhcyB0YXJlYXMgZW4gc2VjdWVuY2lhcyBkaXZlcnRpZGFzIHkgcHJlZGVjaWJsZXMuIn0sImFnZVRpcHMiOnsiMC0yIjp7ImFjb21wYW55IjoiTWFudMOpbiB1biB0b25vIGRlIHZveiBjYXJpw7Fvc28geSBjYXJpY2lhcyBhbCB2ZXN0aXJsZS4gJ0J1ZW5vcyBkw61hcywgbWkgYW1vci4gVmFtb3MgYSBwb25lciBlc3RvcyBjYWxjZXRpbmVzIGNhbGVudGl0b3MgcGFyYSBzYWxpciBhIHZlciBlbCBzb2wnLiIsImxpbWl0IjoiTm8gZW50cmVzIGVuIGRpc2N1c2lvbmVzIHNpIHF1aWVyZSB1c2FyIG90cmEgcHJlbmRhIGluYWRlY3VhZGEgcGFyYSBlbCBjbGltYS4gRWxpZ2UgdMO6IGRvcyBvcGNpb25lcyB2w6FsaWRhcyBkZSBhbnRlbWFuby4iLCJtb2RlbCI6Ik11w6l2ZXRlIGNvbiBjYWxtYSBmw61zaWNhLCBzb25yw61lIGFsIGhhY2VyIGNvbnRhY3RvIHZpc3VhbCBwb3IgbGEgbWHDsWFuYS4iLCJhY3RpdmF0ZSI6IkFsaXN0YSBzdSBwYcOxYWxlcmEgeSB0dSByb3BhIGxhIG5vY2hlIGFudGVyaW9yLiBEZWphIGVsIGNhbHphZG8ganVudG8gYSBsYSBzYWxpZGEuIn0sIjMtNSI6eyJhY29tcGFueSI6IkNvbmVjdGEgYW50ZXMgZGUgcGVkaXI6ICdIb2xhIGRvcm1pbMOzbiwgwr9jw7NtbyBkZXNjYW5zYXN0ZT8gVGUgZG95IHVuIGFicmF6byBnaWdhbnRlIGRlIHJlY2FyZ2EgcGFyYSBlbXBlemFyIGVsIGTDrWEnLiIsImxpbWl0IjoiTMOtbWl0ZSBlc3RydWN0dXJhZG86ICdZYSBkZXNheXVuYW1vcywgYWhvcmEgZXMgbW9tZW50byBkZSBwb25lciBsb3MgemFwYXRvcy4gwr9UZSBsb3MgcG9uZXMgdMO6IG8gdGUgYXl1ZG8gY29uIGxvcyBjb3Jkb25lcz8nIiwibW9kZWwiOiJFdml0YSBncml0YXIgZGVzZGUgb3RyYSBoYWJpdGFjacOzbi4gQWPDqXJjYXRlLCBoYXogY29udGFjdG8gdmlzdWFsIHN1YXZlIGEgc3UgYWx0dXJhIGFudGVzIGRlIGRhcmxlIGxhIGluc3RydWNjacOzbi4iLCJhY3RpdmF0ZSI6IlVzYSBsYSAnUnV0aW5hIGRlIE1hw7FhbmEgVmlzdWFsJy4gRWwgbmnDsW8gcHVlZGUgaXIgZGVzdGFwYW5kbyBjYWRhIHBhc28gKFZlc3RpcnNlLCBEZXNheXVuYXIsIFBlaW5hcnNlLCBEaWVudGVzLCBNb2NoaWxhKS4ifSwiNi05Ijp7ImFjb21wYW55IjoiVmFsaWRhIGxhIHBlcmV6YSBtYXR1dGluYTogJ1F1w6kgY29iaWphcyB0YW4gcmljYXMsIMK/dmVyZGFkPyBDdWVzdGEgbXVjaG8gc2FsaXIgZGUgbGEgY2FtYSBjYWxpZW50aXRhIGVuIGxhIG1hw7FhbmEuIFRlIGVudGllbmRvJy4iLCJsaW1pdCI6IlJlZ2xhIGNsYXJhIHNvYnJlIHBhbnRhbGxhczogJ05vIGhheSBwYW50YWxsYXMgcG9yIGxhIG1hw7FhbmEuIE5vcyB2ZXN0aW1vcyB5IGRlc2F5dW5hbW9zIHByaW1lcm8sIHkgc2kgcXVlZGEgdGllbXBvIGxpYnJlIHBvZGVtb3MgbGVlciB1biBjdWVudG8gbyBkaWJ1amFyIGFudGVzIGRlIHNhbGlyJy4iLCJtb2RlbCI6Ik5vIGxlIHByZXBhcmVzIGxhIG1vY2hpbGEgbmkgbGUgdmlzdGFzIHNpIHlhIHB1ZWRlIGhhY2VybG8gc29sby4gVGVuIHBhY2llbmNpYSB5IG1vZGVsYSBsYSBjb25maWFuemEgZW4gc3UgYXV0b25vbcOtYS4iLCJhY3RpdmF0ZSI6IkhhZ2FuIHVuYSBjYXJyZXJhIGFtaXN0b3NhIG8gcG9uZ2FuIHVuYSBhbGFybWEgbXVzaWNhbCBxdWUgaW5kaXF1ZSBxdWUgZmFsdGFuIDEwIG1pbnV0b3MgcGFyYSBjcnV6YXIgbGEgcHVlcnRhIGRlIHNhbGlkYS4ifSwiMTArIjp7ImFjb21wYW55IjoiRGEgZXNwYWNpbyBwYXJhIHN1IGRlc3BlcnRhcjogJ1PDqSBxdWUgdGUgY3Vlc3RhIGFycmFuY2FyIHBvciBsYXMgbWHDsWFuYXMuIFRlIGRlam8gdHUgZGVzYXl1bm8gbGlzdG8gcGFyYSBxdWUgdGUgYWN0aXZlcyBhIHR1IHJpdG1vJy4iLCJsaW1pdCI6IkxhIHB1bnR1YWxpZGFkIGNvbW8gcmVzcG9uc2FiaWxpZGFkOiAnTGEgaG9yYSBkZSBzYWxpZGEgZXMgYSBsYXMgNzo0MCBhLm0uIHBhcmEgbGxlZ2FyIGEgdGllbXBvLiBTaSB0ZSBkZW1vcmFzIG3DoXMsIGFmZWN0YXLDoSB0dSByZWdpc3RybyBkZSBwdW50dWFsaWRhZCBlc2NvbGFyJy4iLCJtb2RlbCI6IkV2aXRhIGxhIGNhbnRhbGV0YSBwZXJzaXN0ZW50ZS4gTWFudMOpbiB0dSBwcm9waWEgcHJlcGFyYWNpw7NuIGJham8gY29udHJvbCBzaW4gY3VscGFybG9zIHBvciB0dSBlc3Ryw6lzLiIsImFjdGl2YXRlIjoiQXnDumRhbGUgYSBjb25maWd1cmFyIHN1IHByb3BpYSBhbGFybWEgZGUgZGVzcGVydGFyLiBEaXNlw7FlbiBqdW50b3MgdW4gZmx1am8gbWF0dXRpbm8gZWZpY2llbnRlIHF1ZSByZXNwZXRlIHN1cyB0aWVtcG9zIGRlIGFycmVnbG8uIn19fSwicHVibGljVGFudHJ1bSI6eyJpZCI6InB1YmxpY1RhbnRydW0iLCJ0aXRsZSI6IkJlcnJpbmNoZSBlbiBQw7pibGljbyAvIFPDunBlciIsImljb24iOiLwn5uN77iPIiwiZGVzY3JpcHRpb24iOiJHcml0b3MgeSBsbGFudG9zIGRlc2NvbnRyb2xhZG9zIGVuIHN1cGVybWVyY2Fkb3MsIHRpZW5kYXMgbyByZXN0YXVyYW50ZXMgcG9ycXVlIHF1aWVyZSBxdWUgY29tcHJlcyBhbGdvLiIsInNjaWVuY2VUaXAiOiJMYSBzb2JyZWVzdGltdWxhY2nDs24gc2Vuc29yaWFsIGRlIGxvcyBsdWdhcmVzIHDDumJsaWNvcyAobHVjZXMsIHJ1aWRvcywgZ2VudGUpIHN1bWFkYSBhbCBjYW5zYW5jaW8gbyBoYW1icmUgaGFjZSBjb2xhcHNhciBlbCBzaXN0ZW1hIGRlIHJlZ3VsYWNpw7NuIGRlbCBuacOxby4gTGEgbWlyYWRhIGFqZW5hIGVzdHJlc2EgYWwgcGFkcmUsIHF1aWVuIHJlYWNjaW9uYSBjb24gaG9zdGlsaWRhZC4iLCJwYXJlbnRNb29kR3VpZGUiOnsic3RyZXNzZWQiOiJJZ25vcmEgcG9yIGNvbXBsZXRvIGxhcyBtaXJhZGFzIGRlIGxvcyBleHRyYcOxb3MuIFN1IG9waW5pw7NuIG5vIGltcG9ydGE7IGxhIGNvLXJlZ3VsYWNpw7NuIGNvbiB0dSBoaWpvIGVzIGxvIMO6bmljbyByZWFsIGVuIGVzdGUgbW9tZW50by4gUmVzcGlyYS4iLCJleGhhdXN0ZWQiOiJObyBjZWRhcyBhbCBsw61taXRlIHBvciB2ZXJnw7xlbnphIHNvY2lhbC4gU2kgY2VkZXMgYWwgYmVycmluY2hlIHBvciBwZW5hLCBsZSBlbnNlw7FhcyBxdWUgZ3JpdGFyIGVuIHDDumJsaWNvIGVzIHVuIHN1cGVycG9kZXIgcGFyYSBjb25zZWd1aXIgbG8gcXVlIHNlYS4iLCJydXNoZWQiOiJTaSBlcyBuZWNlc2FyaW8sIGxldmFudGEgYSB0dSBoaWpvIGNvbiBjdWlkYWRvIHkgbGzDqXZhbG8gYSB1bmEgem9uYSB0cmFucXVpbGEgKGNvbW8gZWwgYXV0byBvIHVuIHBhc2lsbG8gYXBhcnRhZG8pIHBhcmEgcXVlIGRlc2Nhcmd1ZSBzaW4gcHJlc2nDs24gZXh0ZXJuYS4iLCJjYWxtIjoiTWFudMOpbiB1bmEgcG9zdHVyYSBkZSBlc2N1ZG8gcHJvdGVjdG9yIGZyZW50ZSBhbCBuacOxbywgYnJpbmTDoW5kb2xlIHByaXZhY2lkYWQgZW1vY2lvbmFsIG1pZW50cmFzIHNlIGRlc2Fob2dhLiJ9LCJhZ2VUaXBzIjp7IjAtMiI6eyJhY29tcGFueSI6IlPDoWNhbG8gZGVsIGVzdMOtbXVsbyBlc3RyZXNhbnRlIGRlIGlubWVkaWF0by4gJ0VzdMOhcyBjYW5zYWRvLiBWYW1vcyBhZnVlcmEgYSByZXNwaXJhciBhaXJlIHB1cm8nLiIsImxpbWl0IjoiTm8gaW50ZW50ZXMgcmF6b25hci4gTWFudMOpbiBsYSBjYWxtYSBmw61zaWNhIHkgYWJyw6F6YWxvIGFwcmV0YWRpdG8gcGFyYSBjb250ZW5lciBzdSBkZXNib3JkZSBmw61zaWNvLiIsIm1vZGVsIjoiTWFudMOpbiB0dSB2b3ogZW4gdW4gdG9ubyBzdW1hbWVudGUgYmFqbywgY2FzaSB1biBzdXN1cnJvLiBFc3RvIGxlIGF5dWRhIGEgc2ludG9uaXphciBjb24gdHUgY2FsbWEuIiwiYWN0aXZhdGUiOiJIYXogY29tcHJhcyBjb3J0YXMuIEV2aXRhIGlyIGEgdGllbmRhcyBlbiBzdXMgaG9yYXMgZGUgc2llc3RhIG8gZGUgaGFtYnJlLiBMbGV2YSBzaWVtcHJlIGFndWEgeSB1biBzbmFjayBzYWx1ZGFibGUuIn0sIjMtNSI6eyJhY29tcGFueSI6IlBvbnRlIGEgc3Ugbml2ZWwsIGRhbGUgbGEgZXNwYWxkYSBhbCByZXN0byBkZWwgbXVuZG8geSBkaWxlOiAnVGUgYXN1c3Rhc3RlL2Vub2phc3RlIHBvcnF1ZSBubyBwb2RlbW9zIGxsZXZhciBlc2UganVndWV0ZS4gRXN0w6EgYmllbiBsbG9yYXIsIHRlIGFjb21wYcOxbyBhcXXDrScuIiwibGltaXQiOiJNYW50w6luIGVsIGzDrW1pdGUgY29uIGFtb3I6ICdFbnRpZW5kbyBxdWUgbG8gcXVpZXJhcyBtdWNow61zaW1vLCBwZXJvIGhveSBubyB2aW5pbW9zIGEgY29tcHJhciBqdWd1ZXRlcy4gU2UgcXVlZGEgZW4gZWwgZXN0YW50ZScuIiwibW9kZWwiOiJObyBncml0ZXMgbmkgbGUgZGlnYXMgJ21lIGF2ZXJnw7xlbnphcycgbyAnbWlyYSBjw7NtbyB0ZSB2ZSBsYSBnZW50ZScuIEVzbyBlbnNlw7FhIHF1ZSBlbCB2YWxvciBwZXJzb25hbCBkZXBlbmRlIGRlbCBqdWljaW8gZXh0ZXJuby4iLCJhY3RpdmF0ZSI6IkFudGVzIGRlIGVudHJhciBhIGxhIHRpZW5kYSwgaGF6IHVuICdwYWN0byBwcmV2ZW50aXZvJzogJ0hveSB2YW1vcyBhIGNvbXByYXIgbWFuemFuYXMgeSBwYW4uIE5vIGNvbXByYXJlbW9zIGp1Z3VldGVzIG5pIGR1bGNlcy4gwr9NZSBheXVkYXMgYSBidXNjYXIgbGFzIG1hbnphbmFzIHJvamFzPycifSwiNi05Ijp7ImFjb21wYW55IjoiQXnDumRhbGUgYSBtYW5lamFyIGxhIGRlc2lsdXNpw7NuOiAnRXMgdW4ganVndWV0ZSBlc3BlY3RhY3VsYXIsIGVudGllbmRvIHBlcmZlY3RhbWVudGUgcXVlIHRlIGVuY2FudGUuIERhIG11Y2hhIHRyaXN0ZXphIGUgaW1wb3RlbmNpYSBubyBwb2RlciBsbGV2YXJsbyBhIGNhc2EgaG95Jy4iLCJsaW1pdCI6IkZpcm1lemEgc2luIGdyaXRvczogJ1PDqSBxdWUgZXN0w6FzIG11eSB0cmlzdGUuIE5vIHBvZGVtb3MgY29tcHJhcmxvIGhveS4gU2kgcXVpZXJlcywgbGUgdG9tYW1vcyB1bmEgZm90byB5IGxvIGFncmVnYW1vcyBhIHR1IGxpc3RhIGRlIGlkZWFzIHBhcmEgdHUgY3VtcGxlYcOxb3MnLiIsIm1vZGVsIjoiTWFudMOpbiB0dSBjb21wb3N0dXJhIGbDrXNpY2EuIFR1cyBicmF6b3MgZGViZW4gZXN0YXIgc3VlbHRvcyB5IHR1IG1pcmFkYSBkZWJlIHByb3llY3RhciBlbXBhdMOtYSwgbm8gZW5vam8gbyBkZWNlcGNpw7NuLiIsImFjdGl2YXRlIjoiQXPDrWduYWxlcyB1biByb2wgYWN0aXZvIGR1cmFudGUgbGEgY29tcHJhOiBsbGV2YXIgbGEgbGlzdGEsIGVtcHVqYXIgZWwgY2Fycml0byBwZXF1ZcOxbywgYnVzY2FyIGxhcyBtYXJjYXMgZGUgYWxpbWVudG9zIG8gcGVzYXIgbGFzIHZlcmR1cmFzLiJ9LCIxMCsiOnsiYWNvbXBhbnkiOiJFdml0YSBsYSBodW1pbGxhY2nDs246ICdTw6kgcXVlIGVzdMOhcyBtdXkgbW9sZXN0byBwb3IgY8OzbW8gcmVzb2x2aW1vcyBlc3RvLiBIYWJsZW1vcyBkZSBlc3RvIGVuIHVuIGx1Z2FyIG3DoXMgcHJpdmFkbyBwYXJhIGJ1c2NhciB1biBhY3VlcmRvJy4iLCJsaW1pdCI6IkzDrW1pdGUgcHJpdmFkbzogJ05vIGNvbnZlcnNhcsOpIHNvYnJlIGVzdG8gbWllbnRyYXMgbGV2YW50ZW1vcyBsYSB2b3ouIFZhbW9zIGFsIGF1dG8vYWZ1ZXJhIGEgY2FsbWFybm9zIHByaW1lcm8nLiIsIm1vZGVsIjoiTm8gZGlzY3V0YXMgbmkgZGVqZXMgZGUgaGFibGFybGUgKGxleSBkZWwgaGllbG8pLiBNb2RlbGEgZWwgcmVzcGV0byBtdXR1byBlIGlnbm9yYSBsYXMgcHJvdm9jYWNpb25lcyBwYXNpdm8tYWdyZXNpdmFzLiIsImFjdGl2YXRlIjoiRXN0YWJsZXpjYW4gZXhwZWN0YXRpdmFzIHkgcHJlc3VwdWVzdG9zIGRlIGdhc3RvIGFudGVzIGRlIHNhbGlyIGRlIGNhc2EuIFBlcm3DrXRlbGVzIGdlc3Rpb25hciB1biBwZXF1ZcOxbyBtb25lZGVybyBwYXJhIHN1cyBwcm9waW9zIGNhcHJpY2hvcy4ifX19fQ==")))),
+                playbook: JSON.parse(decodeURIComponent(escape(atob("W3siY29uZmxpY3QiOiJzY3JlZW5zIiwidGl0bGUiOiJBcGFnYXIgbGEgVGFibGV0IiwicmVhY3RpdmVUaXRsZSI6IkVsIENhbWlubyBkZWwgR3JpdG8gKFJlYWN0aXZvKSIsInJlYWN0aXZlVGV4dCI6IkxlIGFycmViYXRhcyBsYSB0YWJsZXQgZGljaWVuZG86ICfCoVlhIGJhc3RhIGRlIGZsb2plcmEhIMKhVGUgbG8gYWR2ZXJ0w60hJy4gRWwgbmnDsW8gZ3JpdGEgeSBzZSB0aXJhIGFsIHBpc28uIExlIGdyaXRhcyBtw6FzIGZ1ZXJ0ZSB5IGxvIGFtZW5hemFzIGNvbiBxdWl0YXJsZSBsYSB0YWJsZXQgcG9yIHVuIG1lcy4gU3UgY2VyZWJybyBlbnRyYSBlbiBhbGVydGEgZGUgcGVsaWdybyAoY29ydGlzb2wgeSBhZHJlbmFsaW5hKSwgYmxvcXVlYW5kbyBlbCBhcHJlbmRpemFqZS4iLCJjYWxtVGl0bGUiOiJFbCBDYW1pbm8gQ0FMTUEgKFJlc3BldHVvc28pIiwiY2FsbVRleHQiOiJUZSBhY2VyY2FzLCB0b2NhcyBzdSBob21icm8geSBjb21lbnRhcyBsbyBkaXZlcnRpZG8gcXVlIHNlIHZlIGVsIGp1ZWdvLiBMZSByZWN1ZXJkYXMgcXVlIHF1ZWRhbiAyIG1pbnV0b3MuIEFsIHNvbmFyIGVsIHRlbXBvcml6YWRvciwgbGUgYXl1ZGFzIGEgZ3VhcmRhciB5IGFwYWdhcyBsYSBwYW50YWxsYSBjb24gc3VhdmlkYWQuIFZhbGlkYXMgc3UgZnJ1c3RyYWNpw7NuICgnc8OpIHF1ZSBkYSByYWJpYSBhcGFnYXJsYScpIHkgbGUgb2ZyZWNlcyB1biBhYnJhem8uIEVsIGNlcmVicm8gZGVsIG5pw7FvIGFwcmVuZGUgYSB0b2xlcmFyIGxhIGZydXN0cmFjacOzbiBhcG95YWRvIGVuIHR1IHJlZ3VsYWNpw7NuLiJ9LHsiY29uZmxpY3QiOiJiZWR0aW1lIiwidGl0bGUiOiJIb3JhIGRlIERvcm1pciIsInJlYWN0aXZlVGl0bGUiOiJFbCBDYW1pbm8gZGVsIEdyaXRvIChSZWFjdGl2bykiLCJyZWFjdGl2ZVRleHQiOiJHcml0YXMgZGVzZGUgZWwgcGFzaWxsbzogJ8KhQSBsYSBjYW1hIHlhISDCoU8gbGxhbW8gYSBsYSBwb2xpY8OtYSBkZWwgc3Vlw7FvIScuIEFudGUgc3UgcmVzaXN0ZW5jaWEsIGVudHJhcyBlbm9qYWRvLCBsbyBtZXRlcyBhIGxhIGNhbWEgYnJ1c2NhbWVudGUgeSBjaWVycmFzIGxhIHB1ZXJ0YSBkZSB1biBwb3J0YXpvLiBFbCBuacOxbyBsbG9yYSBkZSBww6FuaWNvLCBzZSBzaWVudGUgYWJhbmRvbmFkbyBlbiBsYSBvc2N1cmlkYWQgeSBhc29jaWEgZG9ybWlyIGNvbiBwZWxpZ3JvIHkgcmVjaGF6byBwYXJlbnRhbC4iLCJjYWxtVGl0bGUiOiJFbCBDYW1pbm8gQ0FMTUEgKFJlc3BldHVvc28pIiwiY2FsbVRleHQiOiJCYWphcyBsYXMgbHVjZXMgZGUgbGEgY2FzYSB5IHBvbmVzIG3DunNpY2EgdHJhbnF1aWxhLiBTaWd1ZW4gbG9zIHBhc29zIHZpc3VhbGVzIGRlIGxhIHJ1dGluYSBub2N0dXJuYS4gVGUgYWN1ZXN0YXMgYSBzdSBsYWRvLCBjb252ZXJzYW4gZGUgbG8gbWVqb3IgZGVsIGTDrWEgeSByZXNwaXJhcyByw610bWljYW1lbnRlIHBhcmEgY28tcmVndWxhcmxvLiBFbCBuacOxbyBzZSBzaWVudGUgc2VndXJvLCBjb25lY3RhZG8gY29udGlnbyB5IHN1IHNpc3RlbWEgbmVydmlvc28gc2ltcMOhdGljbyBzZSBhcGFnYSwgcGVybWl0aWVuZG8gdW4gc3Vlw7FvIHByb2Z1bmRvLiJ9LHsiY29uZmxpY3QiOiJjb2xsYWJvcmF0aW9uIiwidGl0bGUiOiJPcmRlbmFyIGxvcyBKdWd1ZXRlcyIsInJlYWN0aXZlVGl0bGUiOiJFbCBDYW1pbm8gZGVsIEdyaXRvIChSZWFjdGl2bykiLCJyZWFjdGl2ZVRleHQiOiJMZSBleGlnZXMgZGUgbGVqb3M6ICfCoUxpbXBpYSBlc3RlIGNoaXF1ZXJvIGFob3JhIG1pc21vIG8gdGlybyB0b2RvIGEgbGEgYmFzdXJhIScuIENvbW8gZWwgbmnDsW8gc2UgYmxvcXVlYSBwb3IgbGEgb3JkZW4gdmFnYSwgcmVjb2dlcyB0b2RvIGVuZnVyZWNpZG8gdGlyYW5kbyBqdWd1ZXRlcyBlbiBib2xzYXMgcGzDoXN0aWNhcyBtaWVudHJhcyBsZSByZWNsYW1hcyBwb3Igc3UgZmFsdGEgZGUgYWdyYWRlY2ltaWVudG8uIEVsIG5pw7FvIGFwcmVuZGUgbWllZG8geSBkZXNjb25maWFuemEsIG5vIG9yZGVuLiIsImNhbG1UaXRsZSI6IkVsIENhbWlubyBDQUxNQSAoUmVzcGV0dW9zbykiLCJjYWxtVGV4dCI6IlRlIHBvbmVzIGEgc3Ugbml2ZWwuIENvbnZpZXJ0ZXMgbGEgdGFyZWEgZW4gdW4gcmV0byBwZXF1ZcOxbzogJ8KhRXMgaG9yYSBkZSBsYSBjdWV2YSBkZSBsb3MganVndWV0ZXMhIFlvIGd1YXJkbyBsb3MgY29jaGVzIHkgdMO6IGxvcyBwZWx1Y2hlcywgwr9saXN0bz8nLiBBZ3JhZGVjZXMgc3UgYXl1ZGEgZXNwZWPDrWZpY2E6ICdHcmFjaWFzIHBvciBwb25lciBsb3MgcGVsdWNoZXMgZW4gc3UgcmVwaXNhLCBhaG9yYSBwb2RlbW9zIGNhbWluYXIgc2VndXJvcycuIEVsIG5pw7FvIGFzb2NpYSBjb29wZXJhciBjb24gcGVydGVuZW5jaWEgeSDDqXhpdG8uIn1d")))),
+
+                selectedEbookSection: 'intro',
+
+                // 21-Day challenge state
+                challengeDays: [],
+                selectedChallengeDayNum: 1,
+                journalEntries: {},
+                
+                // Visual routine lists
+                selectedRoutineType: 'morning',
+                isChildModeActive: false,
+                routines: {
+                    morning: [
+                        { id: 'm1', text: 'Tender la cama', emoji: '🛌', time: '7:15 AM', completed: false },
+                        { id: 'm2', text: 'Vestirse solo/a', emoji: '👕', time: '7:30 AM', completed: false },
+                        { id: 'm3', text: 'Cepillarse los dientes', emoji: '🪥', time: '7:45 AM', completed: false }
+                    ],
+                    afternoon: [
+                        { id: 'a1', text: 'Hacer deberes escolares', emoji: '📚', time: '3:30 PM', completed: false },
+                        { id: 'a2', text: 'Ordenar mochila', emoji: '🎒', time: '5:00 PM', completed: false }
+                    ],
+                    night: [
+                        { id: 'n1', text: 'Ponerse el pijama', emoji: '💤', time: '8:00 PM', completed: false },
+                        { id: 'n2', text: 'Cuento de buenas noches', emoji: '📖', time: '8:30 PM', completed: false }
+                    ]
+                },
+                newRoutineText: '',
+                newRoutineEmoji: '🪥',
+                newRoutineTime: '8:00 AM',
+
+                // Breathing & audio S.O.S.
+                breathState: 'Inhala',
+                soundActive: false,
+                isCrisisActive: false,
+                isBreathingActive: true,
+                activeStep: 1,
+                sosStepDetails: [
+                    {
+                        step: 1,
+                        title: "C — Calmar (Tú Primero)",
+                        subtitle: "Un adulto calmado crea un entorno seguro",
+                        desc: "Antes de hablarle a tu hijo o corregir el berrinche, necesitas regular tu propio sistema nervioso. Tu calma se contagia a su cerebro desbordado. Respira hondo siguiendo el círculo de co-regulación.",
+                        prompt: "Sigue el ritmo de respiración: Inhala lento (4s), Retén (4s), Exhala liberando tensión (4s)."
+                    },
+                    {
+                        step: 2,
+                        title: "A — Acompañar",
+                        subtitle: "Guía emocional, no control",
+                        desc: "Ponte a su nivel físico (agáchate). Míralo con compasión. Su cerebro lógico está apagado, por lo que las palabras complicadas no servirán. Tu presencia física es su ancla.",
+                        prompt: "Di frases cortas de conexión: 'Estoy aquí contigo', 'Sé que estás enojado, te acompaño', 'Estás a salvo'."
+                    },
+                    {
+                        step: 3,
+                        title: "L — Limitar con Amor",
+                        subtitle: "Los límites protegen y dan estructura",
+                        desc: "El hecho de aceptar su emoción no significa que afectes conductas destructivas. El límite es firme y claro, pero transmitido con un tono suave y amoroso, jamás agresivo.",
+                        prompt: "Frase guía de límite: 'Entiendo que quieras jugar, pero es hora de comer. No puedo dejar que golpees o lances cosas'."
+                    },
+                    {
+                        step: 4,
+                        title: "M — Modelar",
+                        subtitle: "Tus acciones enseñan autorregulación",
+                        desc: "Evita engancharte en una lucha de poder. No grites ni amenaces. Si gritas, le enseñas que el enojo se resuelve gritando. Demuéstrale cómo se ve la paciencia frente a la tormenta.",
+                        prompt: "Mantén tus hombros relajados, tus manos abiertas, y respira con un suspiro audible para que tu hijo te imite."
+                    },
+                    {
+                        step: 5,
+                        title: "A — Activar acompañamiento",
+                        subtitle: "No apures el proceso",
+                        desc: "La rabieta tiene una curva biológica: sube, llega a un pico de descarga y luego baja naturalmente. Permítele descargar la tensión sin prisa. Cuando termine, estará receptivo a hablar.",
+                        prompt: "Cuando empiece a calmarse, ofrécele un abrazo suave o un trago de agua templada. ¡Lo han logrado juntos!"
+                    }
+                ],
+
+                getSosCurrentStepInfo() {
+                    return this.sosStepDetails[this.activeStep - 1];
+                },
+                handleNextSosStep() {
+                    if (this.activeStep < 5) this.activeStep++;
+                },
+                handlePrevSosStep() {
+                    if (this.activeStep > 1) this.activeStep--;
+                },
+                handleResetCrisis() {
+                    this.activeStep = 1;
+                    this.breathState = 'Inhala';
+                    this.isCrisisActive = false;
+                    if (this.soundActive) {
+                        this.toggleSound();
+                    }
+                },
+
+                // Star Point Board Multi-child state
+                familySurname: '',
+                selectedChildId: '',
+                newChildName: '',
+                newChildAvatar: '👦',
+                showCertificate: false,
+                children: [
+                    {
+                        id: 'c1',
+                        name: 'Lucas',
+                        avatar: '👦',
+                        stars: 12,
+                        dailyTasks: [
+                            { id: 't1', text: 'Ordenar mis juguetes', completed: true },
+                            { id: 't2', text: 'Poner la mesa', completed: false },
+                            { id: 't3', text: 'Lavar mis dientes', completed: true }
+                        ],
+                        weeklyTask: { id: 'w1', text: 'Limpieza profunda de la habitación', completed: false },
+                        optionalTask: { id: 'o1', text: 'Ayudar a regar las plantas del jardín', points: 2, completed: false }
+                    }
+                ],
+
+                // Parent coach diagnostics filter state
+                coachSubTab: 'planner',
+                selectedConflictId: 'screens',
+                selectedCoachAge: '3-5',
+                parentCoachMood: 'stressed',
+                parentPledge: '',
+                savedPledge: '',
+                pledgeDesign: 'vintage',
+
+                init() {
+                    // Populate challengeDays mapping from central data
+                    const savedChallenge = localStorage.getItem('um_challenge_v2');
+                    const parsed = savedChallenge ? JSON.parse(savedChallenge) : {};
+                    
+                    this.challengeDays = this.plan21Days.map(item => ({
+                        day: item.day,
+                        title: item.title,
+                        task: item.action,
+                        objective: item.objective,
+                        examples: item.examples || [],
+                        quote: item.quote || "",
+                        completed: !!parsed[item.day]
+                    }));
+
+                    // Load journal reflections
+                    const savedJournal = localStorage.getItem('um_journal_v2');
+                    if (savedJournal) {
+                        try {
+                            this.journalEntries = JSON.parse(savedJournal);
+                        } catch (e) {
+                            console.error(e);
+                        }
+                    }
+
+                    // Load other general localStorage elements
+                    const savedSurname = localStorage.getItem('um_surname');
+                    if (savedSurname) this.familySurname = savedSurname;
+
+                    const savedChildren = localStorage.getItem('um_children_v1');
+                    if (savedChildren) {
+                        this.children = JSON.parse(savedChildren);
+                    }
+                    if (this.children.length > 0) {
+                        this.selectedChildId = this.children[0].id;
+                    }
+
+                    const savedPledgeValue = localStorage.getItem('parent_calma_pledge');
+                    if (savedPledgeValue) {
+                        this.savedPledge = savedPledgeValue;
+                        this.parentPledge = savedPledgeValue;
+                    } else {
+                        const defaultPledge = "Hoy me comprometo a tomar 3 respiraciones profundas antes de reaccionar ante los berrinches de mi hijo, recordando que su cerebro está en desarrollo y necesita mi guía, no mi control.";
+                        this.savedPledge = defaultPledge;
+                        this.parentPledge = defaultPledge;
+                    }
+
+                    const savedRoutines = localStorage.getItem('um_routines');
+                    if (savedRoutines) {
+                        try {
+                            const parsedRoutines = JSON.parse(savedRoutines);
+                            // Ensure each routine task has a completed property defined
+                            Object.keys(parsedRoutines).forEach(key => {
+                                if (Array.isArray(parsedRoutines[key])) {
+                                    parsedRoutines[key].forEach(t => {
+                                        if (t.completed === undefined) {
+                                            t.completed = false;
+                                        }
+                                    });
+                                }
+                            });
+                            this.routines = parsedRoutines;
+                        } catch (e) {
+                            console.error("Error parsing saved routines:", e);
+                        }
+                    }
+
+                    // Start co-regulation breathing rhythm timer (4 seconds per state cycle)
+                    setInterval(() => {
+                        if (this.breathState === 'Inhala') {
+                            this.breathState = 'Retén';
+                        } else if (this.breathState === 'Retén') {
+                            this.breathState = 'Exhala';
+                        } else {
+                            this.breathState = 'Inhala';
+                        }
+                    }, 4000);
+                },
+
+                // 21-Day challenge helpers
+                getActiveChallengeDay() {
+                    return this.challengeDays.find(d => d.day === this.selectedChallengeDayNum) || this.challengeDays[0];
+                },
+
+                getChallengeProgressPercent() {
+                    const comp = this.challengeDays.filter(d => d.completed).length;
+                    return Math.round((comp / 21) * 100);
+                },
+
+                getChallengeProgressText() {
+                    const comp = this.challengeDays.filter(d => d.completed).length;
+                    return comp + " / 21 días";
+                },
+
+                toggleChallengeDay(dayNum, event) {
+                    const d = this.challengeDays.find(x => x.day === dayNum);
+                    if (d) {
+                        d.completed = !d.completed;
+                        const data = {};
+                        this.challengeDays.forEach(x => {
+                            data[x.day] = x.completed;
+                        });
+                        localStorage.setItem('um_challenge_v2', JSON.stringify(data));
+                        if (d.completed) {
+                            this.triggerConfetti(event?.clientX, event?.clientY);
+                        }
+                    }
+                },
+
+                saveJournal() {
+                    localStorage.setItem('um_journal_v2', JSON.stringify(this.journalEntries));
+                },
+
+                savePledge() {
+                    localStorage.setItem('parent_calma_pledge', this.parentPledge);
+                    this.savedPledge = this.parentPledge;
+                },
+
+                // Deep linking from book chapter read view directly to relevant coach configs
+                deepLinkToCoach(chapterId) {
+                    this.activeTab = 'coach';
+                    this.coachSubTab = 'planner';
+                    
+                    if (chapterId.includes('screens') || chapterId.includes('intro')) {
+                        this.selectedConflictId = 'screens';
+                    } else if (chapterId.includes('sleep') || chapterId.includes('bedtime') || chapterId.includes('routines')) {
+                        this.selectedConflictId = 'bedtime';
+                    } else if (chapterId.includes('colabora') || chapterId.includes('responsibility')) {
+                        this.selectedConflictId = 'collaboration';
+                    } else if (chapterId.includes('mañana') || chapterId.includes('prisas')) {
+                        this.selectedConflictId = 'mornings';
+                    } else if (chapterId.includes('public') || chapterId.includes('tantrum')) {
+                        this.selectedConflictId = 'publicTantrum';
+                    }
+                },
+
+                getCurrentRoutineTasks() {
+                    return this.routines[this.selectedRoutineType] || [];
+                },
+
+                addRoutineTask() {
+                    if (!this.newRoutineText) return;
+                    const newTask = {
+                        id: 'rt-' + Date.now(),
+                        text: this.newRoutineText,
+                        emoji: this.newRoutineEmoji,
+                        time: this.newRoutineTime,
+                        completed: false
+                    };
+                    this.routines[this.selectedRoutineType].push(newTask);
+                    localStorage.setItem('um_routines', JSON.stringify(this.routines));
+                    this.newRoutineText = '';
+                    this.newRoutineEmoji = '🪥';
+                },
+
+                deleteRoutineTask(id) {
+                    this.routines[this.selectedRoutineType] = this.routines[this.selectedRoutineType].filter(t => t.id !== id);
+                    localStorage.setItem('um_routines', JSON.stringify(this.routines));
+                },
+
+                toggleRoutineTaskCompleted(taskId, event) {
+                    const task = this.getCurrentRoutineTasks().find(t => t.id === taskId);
+                    if (task) {
+                        task.completed = !task.completed;
+                        localStorage.setItem('um_routines', JSON.stringify(this.routines));
+                        if (task.completed) {
+                            this.triggerConfetti(event?.clientX, event?.clientY);
+                        }
+                    }
+                },
+
+                getRoutineProgressPercent() {
+                    const tasks = this.getCurrentRoutineTasks();
+                    if (tasks.length === 0) return 0;
+                    const completed = tasks.filter(t => t.completed).length;
+                    return Math.round((completed / tasks.length) * 100);
+                },
+
+                getRoutineCompletedCount() {
+                    return this.getCurrentRoutineTasks().filter(t => t.completed).length;
+                },
+
+                resetRoutineCheckboxes() {
+                    this.getCurrentRoutineTasks().forEach(t => t.completed = false);
+                    localStorage.setItem('um_routines', JSON.stringify(this.routines));
+                },
+
+                toggleSound() {
+                    if (this.soundActive) {
+                        this.soundActive = false;
+                        if (offlineOscillators) {
+                            offlineOscillators.forEach(osc => {
+                                try { osc.stop(); osc.disconnect(); } catch (e) {}
+                            });
+                            offlineOscillators = null;
+                        }
+                        if (offlineAudioCtx) {
+                            try { offlineAudioCtx.close(); } catch (e) {}
+                            offlineAudioCtx = null;
+                        }
+                    } else {
+                        try {
+                            this.soundActive = true;
+                            offlineAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+                            const startTone = () => {
+                                const gainNode = offlineAudioCtx.createGain();
+                                // Fade-in suave para evitar "click" y volumen más audible en bocinas pequeñas
+                                gainNode.gain.setValueAtTime(0.0001, offlineAudioCtx.currentTime);
+                                gainNode.gain.exponentialRampToValueAtTime(0.14, offlineAudioCtx.currentTime + 0.6);
+
+                                // Fundamental: 110Hz (la frecuencia base del hum)
+                                const osc1 = offlineAudioCtx.createOscillator();
+                                osc1.type = 'sine';
+                                osc1.frequency.setValueAtTime(110, offlineAudioCtx.currentTime);
+
+                                // Segundo tono a 111.5Hz: crea el latido suave de 1.5Hz
+                                const osc2 = offlineAudioCtx.createOscillator();
+                                osc2.type = 'sine';
+                                osc2.frequency.setValueAtTime(111.5, offlineAudioCtx.currentTime);
+
+                                // Armónico a 220Hz (una octava arriba de 110Hz): la mayoría de
+                                // bocinas de celular/laptop casi no reproducen 110Hz por ser muy grave;
+                                // este armónico asegura que el hum SÍ se escuche, en un volumen más bajo.
+                                const harmonicGain = offlineAudioCtx.createGain();
+                                harmonicGain.gain.setValueAtTime(0.35, offlineAudioCtx.currentTime);
+                                const osc3 = offlineAudioCtx.createOscillator();
+                                osc3.type = 'sine';
+                                osc3.frequency.setValueAtTime(220, offlineAudioCtx.currentTime);
+
+                                osc1.connect(gainNode);
+                                osc2.connect(gainNode);
+                                osc3.connect(harmonicGain);
+                                harmonicGain.connect(gainNode);
+                                gainNode.connect(offlineAudioCtx.destination);
+
+                                osc1.start();
+                                osc2.start();
+                                osc3.start();
+
+                                offlineOscillators = [osc1, osc2, osc3];
+                            };
+
+                            if (offlineAudioCtx.state === 'suspended') {
+                                offlineAudioCtx.resume().then(startTone);
+                            } else {
+                                startTone();
+                            }
+                        } catch (e) {
+                            console.error("Audio Context not permitted without user interaction.", e);
+                            this.soundActive = false;
+                        }
+                    }
+                },
+
+                getSelectedChild() {
+                    return this.children.find(c => c.id === this.selectedChildId);
+                },
+
+                addChild() {
+                    if (!this.newChildName) return;
+                    const nc = {
+                        id: 'c-' + Date.now(),
+                        name: this.newChildName,
+                        avatar: this.newChildAvatar,
+                        stars: 0,
+                        dailyTasks: [
+                            { id: 't1', text: 'Ordenar juguetes', completed: false },
+                            { id: 't2', text: 'Poner la mesa', completed: false },
+                            { id: 't3', text: 'Cepillar dientes', completed: false }
+                        ],
+                        weeklyTask: { id: 'w1', text: 'Colaboración semanal profunda', completed: false },
+                        optionalTask: { id: 'o1', text: 'Tarea especial opcional', points: 2, completed: false }
+                    };
+                    this.children.push(nc);
+                    this.selectedChildId = nc.id;
+                    this.saveChildren();
+                    this.newChildName = '';
+                    this.newChildAvatar = '👦';
+                },
+
+                saveChildren() {
+                    localStorage.setItem('um_children_v1', JSON.stringify(this.children));
+                    localStorage.setItem('um_surname', this.familySurname);
+                },
+
+                deleteChild(id) {
+                    this.children = this.children.filter(c => c.id !== id);
+                    this.saveChildren();
+                    if (this.children.length > 0) {
+                        this.selectedChildId = this.children[0].id;
+                    } else {
+                        this.selectedChildId = '';
+                    }
+                },
+
+                toggleDailyTask(taskId, event) {
+                    const child = this.getSelectedChild();
+                    if (child) {
+                        const task = child.dailyTasks.find(t => t.id === taskId);
+                        if (task) {
+                            task.completed = !task.completed;
+                            child.stars += task.completed ? 1 : -1;
+                            this.saveChildren();
+                            if (task.completed) {
+                                this.triggerConfetti(event?.clientX, event?.clientY);
+                            }
+                        }
+                    }
+                },
+
+                toggleWeeklyTask(event) {
+                    const child = this.getSelectedChild();
+                    if (child) {
+                        child.weeklyTask.completed = !child.weeklyTask.completed;
+                        child.stars += child.weeklyTask.completed ? 3 : -3;
+                        this.saveChildren();
+                        if (child.weeklyTask.completed) {
+                            this.triggerConfetti(event?.clientX, event?.clientY);
+                        }
+                    }
+                },
+
+                toggleOptionalTask(event) {
+                    const child = this.getSelectedChild();
+                    if (child) {
+                        child.optionalTask.completed = !child.optionalTask.completed;
+                        const pts = child.optionalTask.points;
+                        child.stars += child.optionalTask.completed ? pts : -pts;
+                        this.saveChildren();
+                        if (child.optionalTask.completed) {
+                            this.triggerConfetti(event?.clientX, event?.clientY);
+                        }
+                    }
+                },
+
+                // Celebratory particle confetti effect generator
+                triggerConfetti(xCoord, yCoord) {
+                    const container = document.getElementById('particle-overlay-box');
+                    if (!container) return;
+
+                    const startX = xCoord || window.innerWidth / 2;
+                    const startY = yCoord || window.innerHeight / 2;
+
+                    const colors = ["#7B2FBE", "#FF7900", "#AD6639", "#26215C", "#C9A7E8", "#FFC65C"];
+                    const count = 30;
+
+                    for (let i = 0; i < count; i++) {
+                        const el = document.createElement('div');
+                        el.style.position = 'fixed';
+                        el.style.pointerEvents = 'none';
+                        el.style.width = (6 + Math.random() * 12) + 'px';
+                        el.style.height = (6 + Math.random() * 12) + 'px';
+                        el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                        el.style.borderRadius = Math.random() > 0.5 ? '50%' : '3px';
+                        el.style.left = startX + 'px';
+                        el.style.top = startY + 'px';
+                        el.style.zIndex = 9999;
+
+                        container.appendChild(el);
+
+                        const angle = Math.random() * Math.PI * 2;
+                        const velocity = 40 + Math.random() * 150;
+                        const endX = Math.cos(angle) * velocity;
+                        const endY = Math.sin(angle) * velocity - (50 + Math.random() * 100);
+
+                        el.animate([
+                            { transform: 'translate(0, 0) scale(0) rotate(0deg)', opacity: 1 },
+                            { transform: 'translate(' + endX + 'px, ' + (endY + 200) + 'px) scale(1) rotate(720deg)', opacity: 0 }
+                        ], {
+                            duration: 1200 + Math.random() * 1000,
+                            easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)'
+                        }).onfinish = () => el.remove();
+                    }
+                },
+
+                // Parent coach diagnostics dataset matching functions
+                getCoachConflictInfo() {
+                    return this.conflictDatabase[this.selectedConflictId] || this.conflictDatabase.screens;
+                },
+
+                getCoachMoodGuide() {
+                    const info = this.getCoachConflictInfo();
+                    return info.parentMoodGuide[this.parentCoachMood] || info.parentMoodGuide.stressed;
+                },
+
+                getCoachAgeTips() {
+                    const info = this.getCoachConflictInfo();
+                    return info.ageTips[this.selectedCoachAge] || info.ageTips["3-5"];
+                }
+            };
+        }
+    </script>
+</body>
+</html>
